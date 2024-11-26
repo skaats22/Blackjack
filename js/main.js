@@ -27,26 +27,32 @@ let dScoreEl = document.querySelector('#dealer-score');
 let purseEl = document.querySelector('#purse');
 
 /*--------------- event listeners --------------*/
-
+document.querySelector('section').addEventListener('click', handleClick);
 
 /*--------------- functions ---------------*/
 
 
 function init() {
-  pScore= 0;
+  pScore = 0;
   dScore = 0;
   purse = 100;
   currentWager = 0;
   winner = false;
   tie = false;
   turn = 'Player';
-  renderHand()
 
   render();
 }
 
+init();
+
 function render() {
 
+}
+
+function handleClick(evt) {
+  if (evt.target.tagName !== 'BUTTON') return;
+  console.log(evt.target);
 }
 
 function renderDeckInContainer(deck, container) {
