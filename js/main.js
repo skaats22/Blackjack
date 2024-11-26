@@ -98,25 +98,27 @@ function getNewShuffledDeck() {
 }
 
 function renderHand() {
+  // Creating copy of original deck
   const tempDeck = [...originalDeck];
+  // Create arrays for dealer and player hands
   let dHand = [];
   let pHand = [];
+  // Deal player and dealer 2 random cards ensuring can't receive
+  //  exact same cards
   while (dHand.length < 2) {
     const pRndIdx = Math.floor(Math.random() * tempDeck.length);
     pHand.push(tempDeck.splice(pRndIdx, 1) [0]);
     const dRndIdx = Math.floor(Math.random() * tempDeck.length);
     dHand.push(tempDeck.splice(dRndIdx, 1) [0]);
   }
-  
+  // Update player and dealer score
   pScore = pHand[0].value + pHand[1].value;
+  // Only show player score
   pScoreEl.innerText = `Score: ${pScore}`;
   dScore = dHand[0].value + dHand[1].value;
-
+  // Render initial cards on the table
   dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" />`;
   dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
-
-  console.log(pHand);
-  console.log(dHand);
 }

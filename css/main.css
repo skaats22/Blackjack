@@ -15,25 +15,16 @@ h3 {
   background-color: lightpink;
 }
 
-.dealer-cards {
+.dealer-cards, .player-cards {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   border: 5px solid grey;
-  padding: 100px;
-  margin: 50px;
+  padding: 30px;
+  margin: 20px;
   background-color: lightgreen;
-}
+  height: 200px;
 
-.player-cards {
-  color: white;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  border: 5px solid grey;
-  padding: 100px;
-  margin: 50px;
-  background-color: lightgreen;
 }
 
 #wager {
