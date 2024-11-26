@@ -122,9 +122,14 @@ function renderHand() {
   // Only show player score
   pScoreEl.innerText = `Score: ${pScore}`;
   dScore = dHand[0].value + dHand[1].value;
-  // Render initial cards on the table
+  // Render initial cards on the table (except first dealer card)
   dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" />`;
   dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
 }
+
+
+// Have a spceific function that clears only parts of state and 
+//  not the others
+// Have a full reset function that clears all state
