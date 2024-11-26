@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blackjack</title>
-  <link rel="stylesheet" href="css/main.css">
-  <script defer src="js/main.js"></script>
-</head>
-<body>
-  <h3>Original Deck</h3>
-  <section id="original-deck-container" class="card-container"></section>
-  <button>RE-SHUFFLE DECK</button>
-  <h3>Shuffled Deck</h3>
-  <section id="shuffled-deck-container" class="card-container">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>CSS Card Library</title>
+    <link href="css/main.css" rel="stylesheet" type="text/css" />
+    <script defer src="js/main.js"></script>
+  </head>
+  <body>
+  <h1>&#9824 Blackjack</h1>
+  <h2>$10 min</h2>
+  <section id="table">
+    <button id="play">Play!</button>
+    <h3 id="dealer"><u>Dealer</u>
+    <ul>Score: </ul>
+    </h3>
+    <div class="dealer-cards"></div>
+    <h3 id="wager">Current Wager: </h3>
+    <h3 id="player"><u>Player</u>
+      <ul>Score: </ul>
+      <ul>Purse: </ul>
+    </h3>
+    <div class="player-cards"></div>
+    <button id="hit">Hit</button>
+    <button id="stay">Stay</button>
   </section>
 </body>
 </html>

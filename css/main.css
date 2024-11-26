@@ -1,0 +1,47 @@
+* {
+  box-sizing: border-box;
+}
+
+h3 {
+  margin: 10px 10px;
+}
+
+#table {
+  box-sizing: border-box;
+  border: 10px solid black;
+  justify-content: center;
+  height: 1000px;
+  width: 1200px;
+  background-color: lightpink;
+}
+
+.dealer-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  border: 5px solid grey;
+  padding: 100px;
+  margin: 50px;
+  background-color: lightgreen;
+}
+
+.player-cards {
+  color: white;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  border: 5px solid grey;
+  padding: 100px;
+  margin: 50px;
+  background-color: lightgreen;
+}
+
+#wager {
+  text-align: center;
+  border: 5px solid red;
+  margin: 10px 300px;
+}
+
+#hit, #stay {
+  display: flex;
+}
