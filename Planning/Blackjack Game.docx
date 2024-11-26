@@ -1,0 +1,40 @@
+Pseudo Code
+
+1. Create global variable (not constant) of playerScore, dealerScore, purse
+2. Create array of objects with each object representing a card’s
+  a. Numerical value
+  b. Aces can be 1 or 11 - player choice
+    i. Start with value of 11 then change to 1 if someone actually has it
+    ii. MVP - choose 1 or 11 (hard code it initially, then update)
+    iii. Count every ace as 11 first, then separately, count # of aces
+        a. Then check to see if total is > 21, then if have an ace, you can subtract 10
+        b. In a while loop until there’s no more aces or the hand is under 21
+3. Ask player how much they would like to wager and subtract that amount from their purse
+4. Create random card dealing function 
+  a. Randomly deal 2 face-up cards to player
+  b. Deal 1 face up and 1 face down card to dealer
+    i. Use back of card skin to cover card area
+5. Add global constant of playerScore which equals sum of value of all shown cards and display on the table
+6. If dealerScore = 21, then end game and display “You lose!”
+7. If playerScore = 21, then end game and display “You win!”
+8. If playerScore < 21, then provide player with 2 buttons:
+  a. Hit (call on card dealing function to deal player another card)
+    i. Continue the below if playerScore <= 21
+    ii. Update player score
+    iii. If player score > 21, then end game and display “You lose!”
+    iv. Provide hit/stay buttons
+  b. Stay which advances turn to dealer
+9. If dealerScore < 17, dealer must hit
+10. If dealer score = 21, end game and display “You lose!”
+11. If dealer score > 21, end game and display “You win!”
+12. If dealer score >= 17 && dealerScore <21, then advance state of game and compare dealerScore with playerScore
+13. If playerScore > dealerScore, then end game and display scores
+14. Update purse to add 2x of initial amount wagered if player wins 
+15. If purse === 0, then end the game and offer to play again, which will reset the purse
+16. All states have been updated, call render()
+17. Include a Reset button at the top to completely reset
+
+
+
+
+
