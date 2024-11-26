@@ -8,7 +8,8 @@ const originalDeck = buildOriginalDeck();
 //renderDeckInContainer(originalDeck, document.querySelector('.dealer-cards'));
 
 /*--------------- state variables ---------------*/
-let scores;
+let pScore;
+let dScore;
 let purse;
 let currentWager;
 let winner;
@@ -20,6 +21,11 @@ let shuffledDeck;
 let dealerContainerEl = document.querySelector('.dealer-cards');
 let playerContainerEl = document.querySelector('.player-cards');
 
+let pScoreEl = document.querySelector('#player-score');
+let dScoreEl = document.querySelector('#dealer-score');
+
+let purseEl = document.querySelector('#purse');
+
 /*--------------- event listeners --------------*/
 
 
@@ -27,16 +33,14 @@ let playerContainerEl = document.querySelector('.player-cards');
 
 
 function init() {
-  scores = {
-    pScore: 0,
-    dScore: 0,
-  };
+  pScore= 0;
+  dScore = 0;
   purse = 100;
   currentWager = 0;
   winner = false;
   tie = false;
   turn = 'Player';
-  getNewShuffledDeck();
+  renderHand()
 
   render();
 }
@@ -46,8 +50,6 @@ function render() {
 }
 
 function renderDeckInContainer(deck, container) {
-  
-  
   container.innerHTML = '';
   // Let's build the cards as a string of HTML
   let cardsHtml = '';
@@ -95,12 +97,26 @@ function getNewShuffledDeck() {
   return newShuffledDeck;
 }
 
-function renderHand(deck, container) {
+function renderHand() {
   const tempDeck = [...originalDeck];
-  let hand = [];
-  while (hand.length < 2) {
-    const rndIdx = Math.floor(Math.random() * tempDeck.length);
-    hand.push(tempDeck.splice(rndIdx, 1) [0]);
+  let dHand = [];
+  let pHand = [];
+  while (dHand.length < 2) {
+    const pRndIdx = Math.floor(Math.random() * tempDeck.length);
+    pHand.push(tempDeck.splice(pRndIdx, 1) [0]);
+    const dRndIdx = Math.floor(Math.random() * tempDeck.length);
+    dHand.push(tempDeck.splice(dRndIdx, 1) [0]);
   }
-  console.log(hand);
+  
+  pScore = pHand[0].value + pHand[1].value;
+  pScoreEl.innerText = `Score: ${pScore}`;
+  dScore = dHand[0].value + dHand[1].value;
+
+  dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" />`;
+  dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
+  playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
+  playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
+
+  console.log(pHand);
+  console.log(dHand);
 }

@@ -49,3 +49,22 @@ h3 {
 button {
   cursor: pointer;
 }
+
+.card-back {
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 5px 5px 50px 5px;
+  cursor: pointer;
+  font-size: inherit;
+  width: 4.0em;
+  height: 5.5em;
+  background-color: #fff;
+  border-radius: 0.20em;
+  border: 1px solid #c3c3c3;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
