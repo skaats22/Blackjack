@@ -197,3 +197,5 @@ function renderHand() {
 // Have a spceific function that clears only parts of state and 
 //  not the others
 // Have a full reset function that clears all state
+
+// For ace, build in logic only if hit
