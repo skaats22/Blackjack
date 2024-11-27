@@ -38,7 +38,7 @@ let playEl = document.querySelector('#play');
 let allBtnEl = document.querySelectorAll('.btn');
 
 /*--------------- event listeners --------------*/
-document.querySelector('section').addEventListener('click', handleClick);
+document.querySelector('section').addEventListener('click', handleMisclick);
 document.querySelector('#stay').addEventListener('click', switchPlayerTurn);
 document.querySelector('#hit').addEventListener('click', handlePlayerHit);
 document.querySelector('#bet').addEventListener('click', updateWager);
@@ -65,6 +65,7 @@ function init() {
 init();
 
 function render() {
+  purseEl.innerText = `Purse: $${purse}`;
   updateWager();
   dealHand();
   renderHand();
@@ -73,8 +74,21 @@ function render() {
   checkFor21();
   handleDealerHit();
   checkFor21();
-  // switchPlayerTurn(); not sure i need this
+  switchPlayerTurn();
   checkForWinner();
+}
+
+function checkForWinner() {
+  if (pScore < 21) return;
+  if (pScore > dScore) {
+    winner = true;
+    currentWagerEl.innerText = "You win!"
+    purse += (currentWager * 2);
+  } else {
+    winner = true;
+    currentWagerEl.innerText = "Dealer wins!"
+    purse -= currentWager;
+  }
 }
 
 function updateDeck() {
@@ -98,7 +112,7 @@ function checkFor21() {
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
-    currentWagerEl.innerText = "You win!"
+    currentWagerEl.innerText = "You have 21, you win!"
     purse += (currentWager * 2);
     return purse;
   } else return;
@@ -117,11 +131,10 @@ function updateWager(evt) {
 }
 
 // Not sure I need this and could try to combine with another fn
-function switchPlayerTurn(evt) {
+function switchPlayerTurn() {
   // If the player hits stay the goes to dealer
-  if (evt.target.id === 'stay') {
-    allBtnEl.style.visibility = 'hidden';
-  }
+  turn = 'Dealer';
+  //allBtnEl.style.visibility = 'hidden';
 }
 
 function dealHand() {
@@ -132,21 +145,48 @@ function dealHand() {
   renderHand();
 }
 
+// Hit button staying visible one click past 
 function handlePlayerHit(evt) {
-  if (evt.target.id === 'hit') {
-    const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-    pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
-    let lastIndex = pHand.length - 1;
-    let newCard = pHand[lastIndex];
-    playerContainerEl.innerHTML += 
-      `<div class="card ${newCard.face}"></div>` ;
-    // Update player and dealer score
-    pScore += pHand[2].value;
-    // Only show player score
-    pScoreEl.innerText = `Score: ${pScore}`;
-    return currentDeck;
+  checkFor21();
+  if (turn === 'Player') {
+    if (pScore < 21) {
+      if (evt.target.id === 'hit') {
+        const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+        pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+        let lastIndex = pHand.length - 1;
+        let newCard = pHand[lastIndex];
+        playerContainerEl.innerHTML += 
+          `<div class="card ${newCard.face}"></div>` ;
+        // Update player and dealer score
+        pScore += newCard.value;
+        // Only show player score
+        pScoreEl.innerText = `Score: ${pScore}`;
+        return currentDeck;
+      }
+    } else {
+      hitEl.style.visibility = 'hidden';
+      return;
+    }
   }
   console.log(currentDeck);
+}
+
+function handleDealerHit() {
+  checkFor21();
+  if (turn === 'Dealer') {
+    if (dScore <= 16 && dScore !== 21) {
+      const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+      dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+      let lastIndex = dHand.length - 1;
+      let newCard = dHand[lastIndex];
+      dealerContainerEl.innerHTML += 
+        `<div class="card ${newCard.face}"></div>` ;
+      // Update player and dealer score
+      dScore += newCard.value;
+      // Only show player score
+      return currentDeck;
+    }
+  }
 }
 
 // Dealer has to hit on anything <= 16 until total is >=17
@@ -154,33 +194,9 @@ function handleDealerHit() {
   
 }
 
-function handleClick(evt) {
-  if (evt.target.id !== 'bet') return;
-  // if (evt.target.tagName === 'BUTTON') {
-  //   currentWager += 10;
-  //   purse -= 10;
-  //   currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
-  //   purseEl.innerText = `Purse: $${purse}`;
-  //   betEl.style.visibility = 'hidden';
-  // }
-  // console.log(evt.target);
+function handleMisclick(evt) {
+  if (evt.target.class !== 'btn') return;
 }
-
-function renderDeckInContainer(deck, container) {
-  container.innerHTML = '';
-  // Let's build the cards as a string of HTML
-  let cardsHtml = '';
-  deck.forEach(function(card) {
-    cardsHtml += `<div class="card ${card.face}"></div>`;
-  });
-  // Or, use reduce to 'reduce' the array into a single thing - 
-  //  in this case a string of HTML markup 
-  // const cardsHtml = deck.reduce(function(html, card) {
-  //   return html + `<div class="card ${card.face}"></div>`;
-  // }, '');
-  container.innerHTML = cardsHtml;
-}
-
 
 
 function renderHand() {
