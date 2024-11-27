@@ -35,6 +35,7 @@ let stayEl = document.querySelector('#stay');
 let hitEl = document.querySelector('#hit');
 let betEl = document.querySelector('#bet');
 let playEl = document.querySelector('#play');
+let allBtnEl = document.querySelectorAll('.btn');
 
 /*--------------- event listeners --------------*/
 document.querySelector('section').addEventListener('click', handleClick);
@@ -64,14 +65,16 @@ function init() {
 init();
 
 function render() {
-  if (currentWager === 0){
-    updateWager();
-  }
+  updateWager();
+  dealHand();
   renderHand();
   checkFor21();
   handlePlayerHit();
+  checkFor21();
   handleDealerHit();
-  switchPlayerTurn();
+  checkFor21();
+  // switchPlayerTurn(); not sure i need this
+  checkForWinner();
 }
 
 function updateDeck() {
@@ -88,6 +91,8 @@ function checkFor21() {
     hitEl.style.visibility = 'hidden';
     dScoreEl.innerText = 21;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
+    purse -= currentWager;
+    return purse;
   } else if (pScore === 21) {
     winner = true;
     betEl.style.visibility = 'hidden';
@@ -95,6 +100,7 @@ function checkFor21() {
     hitEl.style.visibility = 'hidden';
     currentWagerEl.innerText = "You win!"
     purse += (currentWager * 2);
+    return purse;
   } else return;
 }
 
@@ -110,26 +116,37 @@ function updateWager(evt) {
   } else if (purse === 0) {betEl.style.visibility = 'hidden'};
 }
 
-function switchPlayerTurn() {
+// Not sure I need this and could try to combine with another fn
+function switchPlayerTurn(evt) {
   // If the player hits stay the goes to dealer
-
+  if (evt.target.id === 'stay') {
+    allBtnEl.style.visibility = 'hidden';
+  }
 }
 
 function dealHand() {
-  betEl.style.visbility = 'hidden';
+  dHand = [];
+  pHand = [];
+  dealerContainerEl.innerHTML = '';
+  playerContainerEl.innerHTML = '';
   renderHand();
 }
 
-function handlePlayerHit() {
-  const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-  pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
-  playerContainerEl.innerHTML += 
-    `<div class="card ${pHand[2].face}"></div>` ;
-  // Update player and dealer score
-  pScore += pHand[2].value;
-  // Only show player score
-  pScoreEl.innerText = `Score: ${pScore}`;
-  return currentDeck;
+function handlePlayerHit(evt) {
+  if (evt.target.id === 'hit') {
+    const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+    pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+    let lastIndex = pHand.length - 1;
+    let newCard = pHand[lastIndex];
+    playerContainerEl.innerHTML += 
+      `<div class="card ${newCard.face}"></div>` ;
+    // Update player and dealer score
+    pScore += pHand[2].value;
+    // Only show player score
+    pScoreEl.innerText = `Score: ${pScore}`;
+    return currentDeck;
+  }
+  console.log(currentDeck);
 }
 
 // Dealer has to hit on anything <= 16 until total is >=17
@@ -164,38 +181,6 @@ function renderDeckInContainer(deck, container) {
   container.innerHTML = cardsHtml;
 }
 
-// Credit: Riplit
-function buildOriginalDeck() {
-  const deck = [];
-  // Use nested forEach to generate card objects
-  suits.forEach(function(suit) {
-    ranks.forEach(function(rank) {
-      deck.push({
-        // The 'face' property maps to the library's CSS classes for cards
-        face: `${suit}${rank}`,
-        // Setting the 'value' property for game of blackjack, not war
-        // If rank is 'A' assign it 11 otherwise assign it 10
-        value: Number(rank) || (rank === 'A' ? 11 : 10)
-      });
-    });
-  });
-  return deck;
-}
-
-// Credit: Riplit
-function getNewShuffledDeck() {
-  // Create a copy of the originalDeck (leave originalDeck untouched!)
-  const tempDeck = [...originalDeck];
-  const newShuffledDeck = [];
-  while (tempDeck.length) {
-    // Get a random index for a card still in the tempDeck
-    const rndIdx = Math.floor(Math.random() * tempDeck.length);
-    // Note the [0] after splice - this is because splice always returns 
-    //  an array and we just want the card object in that array
-    newShuffledDeck.push(tempDeck.splice(rndIdx, 1)[0]);
-  }
-  return newShuffledDeck;
-}
 
 
 function renderHand() {
@@ -226,6 +211,23 @@ function renderHand() {
   return currentDeck;
 }
 
+// Credit: Riplit
+function buildOriginalDeck() {
+  const deck = [];
+  // Use nested forEach to generate card objects
+  suits.forEach(function(suit) {
+    ranks.forEach(function(rank) {
+      deck.push({
+        // The 'face' property maps to the library's CSS classes for cards
+        face: `${suit}${rank}`,
+        // Setting the 'value' property for game of blackjack, not war
+        // If rank is 'A' assign it 11 otherwise assign it 10
+        value: Number(rank) || (rank === 'A' ? 11 : 10)
+      });
+    });
+  });
+  return deck;
+}
 
 
 // Have a spceific function that clears only parts of state and 
