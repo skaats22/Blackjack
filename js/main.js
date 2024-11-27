@@ -21,26 +21,28 @@ let pHand;
 let currentDeck;
 
 /*--------------- cached elements  ---------------*/
+// Card container elements
 let dealerContainerEl = document.querySelector('.dealer-cards');
 let playerContainerEl = document.querySelector('.player-cards');
-
+// Player score and dealer score elements
 let pScoreEl = document.querySelector('#player-score');
 let dScoreEl = document.querySelector('#dealer-score');
-
+// Purse and wager elements
 let purseEl = document.querySelector('#purse');
 let currentWagerEl = document.querySelector('#wager');
-
+// Button elements
 let stayEl = document.querySelector('#stay');
 let hitEl = document.querySelector('#hit');
 let betEl = document.querySelector('#bet');
-
 let playEl = document.querySelector('#play');
 
 /*--------------- event listeners --------------*/
 document.querySelector('section').addEventListener('click', handleClick);
 document.querySelector('#stay').addEventListener('click', switchPlayerTurn);
-document.querySelector('#hit').addEventListener('click', handleHit);
+document.querySelector('#hit').addEventListener('click', handlePlayerHit);
 document.querySelector('#bet').addEventListener('click', updateWager);
+document.querySelector('#play').addEventListener('click', render);
+document.querySelector('#deal').addEventListener('click', dealHand);
 
 /*--------------- functions ---------------*/
 
@@ -67,29 +69,45 @@ function render() {
   }
   renderHand();
   checkFor21();
-  handleHit();
+  handlePlayerHit();
+  handleDealerHit();
   switchPlayerTurn();
 }
 
 function updateDeck() {
-
+  // I return currentDeck when I change deck, 
+  //  so don't think i need this...
 }
 
+// Check if dealer or player has 21 before continuing hand
 function checkFor21() {
   if (dScore === 21) {
     winner = true;
-  }
+    betEl.style.visibility = 'hidden';
+    stayEl.style.visibility = 'hidden';
+    hitEl.style.visibility = 'hidden';
+    dScoreEl.innerText = 21;
+    currentWagerEl.innerText = "Dealer has 21, you lose!"
+  } else if (pScore === 21) {
+    winner = true;
+    betEl.style.visibility = 'hidden';
+    stayEl.style.visibility = 'hidden';
+    hitEl.style.visibility = 'hidden';
+    currentWagerEl.innerText = "You win!"
+    purse += (currentWager * 2);
+  } else return;
 }
 
+// Bet button is visible for extra click after purse is 0 
 function updateWager(evt) {
-  if (evt.target.tagName !== 'BUTTON') return;
-  if (evt.target === betEl) {
-    currentWager += 10;
-    purse -= 10;
-    currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
-    purseEl.innerText = `Purse: $${purse}`;
-    betEl.style.visibility = 'hidden';
-  }
+  if (purse > 0) {
+    if (evt.target.id === 'bet') {
+      currentWager += 10;
+      purse -= 10;
+      currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
+      purseEl.innerText = `Purse: $${purse}`;
+    }
+  } else if (purse === 0) {betEl.style.visibility = 'hidden'};
 }
 
 function switchPlayerTurn() {
@@ -97,15 +115,30 @@ function switchPlayerTurn() {
 
 }
 
-function handleHit() {
+function dealHand() {
+  betEl.style.visbility = 'hidden';
+  renderHand();
+}
+
+function handlePlayerHit() {
   const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-  pHand.push(tempDeck.splice(pRndIdx, 1) [0]);
-  const dRndIdx = Math.floor(Math.random() * currentDeck.length);
-  dHand.push(tempDeck.splice(dRndIdx, 1) [0]);
+  pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+  playerContainerEl.innerHTML += 
+    `<div class="card ${pHand[2].face}"></div>` ;
+  // Update player and dealer score
+  pScore += pHand[2].value;
+  // Only show player score
+  pScoreEl.innerText = `Score: ${pScore}`;
+  return currentDeck;
+}
+
+// Dealer has to hit on anything <= 16 until total is >=17
+function handleDealerHit() {
+  
 }
 
 function handleClick(evt) {
-  if (evt.target.tagName !== 'BUTTON') return;
+  if (evt.target.id !== 'bet') return;
   // if (evt.target.tagName === 'BUTTON') {
   //   currentWager += 10;
   //   purse -= 10;
@@ -190,6 +223,7 @@ function renderHand() {
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
   currentDeck = tempDeck;
+  return currentDeck;
 }
 
 
