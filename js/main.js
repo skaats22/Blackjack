@@ -16,6 +16,9 @@ let winner;
 let tie;
 let turn;
 let shuffledDeck;
+let dHand;
+let pHand;
+let currentDeck;
 
 /*--------------- cached elements  ---------------*/
 let dealerContainerEl = document.querySelector('.dealer-cards');
@@ -25,9 +28,19 @@ let pScoreEl = document.querySelector('#player-score');
 let dScoreEl = document.querySelector('#dealer-score');
 
 let purseEl = document.querySelector('#purse');
+let currentWagerEl = document.querySelector('#wager');
+
+let stayEl = document.querySelector('#stay');
+let hitEl = document.querySelector('#hit');
+let betEl = document.querySelector('#bet');
+
+let playEl = document.querySelector('#play');
 
 /*--------------- event listeners --------------*/
 document.querySelector('section').addEventListener('click', handleClick);
+document.querySelector('#stay').addEventListener('click', switchPlayerTurn);
+document.querySelector('#hit').addEventListener('click', handleHit);
+document.querySelector('#bet').addEventListener('click', updateWager);
 
 /*--------------- functions ---------------*/
 
@@ -40,6 +53,8 @@ function init() {
   winner = false;
   tie = false;
   turn = 'Player';
+  dHand = [];
+  pHand = [];
 
   render();
 }
@@ -47,12 +62,58 @@ function init() {
 init();
 
 function render() {
+  if (currentWager === 0){
+    updateWager();
+  }
+  renderHand();
+  checkFor21();
+  handleHit();
+  switchPlayerTurn();
+}
 
+function updateDeck() {
+
+}
+
+function checkFor21() {
+  if (dScore === 21) {
+    winner = true;
+  }
+}
+
+function updateWager(evt) {
+  if (evt.target.tagName !== 'BUTTON') return;
+  if (evt.target === betEl) {
+    currentWager += 10;
+    purse -= 10;
+    currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
+    purseEl.innerText = `Purse: $${purse}`;
+    betEl.style.visibility = 'hidden';
+  }
+}
+
+function switchPlayerTurn() {
+  // If the player hits stay the goes to dealer
+
+}
+
+function handleHit() {
+  const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+  pHand.push(tempDeck.splice(pRndIdx, 1) [0]);
+  const dRndIdx = Math.floor(Math.random() * currentDeck.length);
+  dHand.push(tempDeck.splice(dRndIdx, 1) [0]);
 }
 
 function handleClick(evt) {
   if (evt.target.tagName !== 'BUTTON') return;
-  console.log(evt.target);
+  // if (evt.target.tagName === 'BUTTON') {
+  //   currentWager += 10;
+  //   purse -= 10;
+  //   currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
+  //   purseEl.innerText = `Purse: $${purse}`;
+  //   betEl.style.visibility = 'hidden';
+  // }
+  // console.log(evt.target);
 }
 
 function renderDeckInContainer(deck, container) {
@@ -103,12 +164,13 @@ function getNewShuffledDeck() {
   return newShuffledDeck;
 }
 
+
 function renderHand() {
   // Creating copy of original deck
   const tempDeck = [...originalDeck];
   // Create arrays for dealer and player hands
-  let dHand = [];
-  let pHand = [];
+  // let dHand = [];
+  // let pHand = [];
   // Deal player and dealer 2 random cards ensuring can't receive
   //  exact same cards
   while (dHand.length < 2) {
@@ -127,7 +189,9 @@ function renderHand() {
   dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
+  currentDeck = tempDeck;
 }
+
 
 
 // Have a spceific function that clears only parts of state and 
