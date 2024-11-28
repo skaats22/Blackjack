@@ -39,10 +39,11 @@ let allBtnEl = document.querySelectorAll('.btn');
 
 /*--------------- event listeners --------------*/
 document.querySelector('section').addEventListener('click', handleMisclick);
-document.querySelector('#stay').addEventListener('click', switchPlayerTurn);
-document.querySelector('#hit').addEventListener('click', handlePlayerHit);
-document.querySelector('#bet').addEventListener('click', updateWager);
-document.querySelector('#play').addEventListener('click', render);
+stayEl.addEventListener('click', handleDealerHit);
+playEl.addEventListener('click', handlePlayerHit, render);
+hitEl.addEventListener('click', handlePlayerHit);
+// document.querySelector('#bet').addEventListener('click', updateWager);
+betEl.addEventListener('click', updateWager);
 document.querySelector('#deal').addEventListener('click', dealHand);
 
 /*--------------- functions ---------------*/
@@ -63,37 +64,71 @@ function init() {
 }
 
 init();
+render();
 
 function render() {
   purseEl.innerText = `Purse: $${purse}`;
-  updateWager();
-  dealHand();
-  renderHand();
+  currentWagerEl.innerText = `Current Wager: $${currentWager}`;
   checkFor21();
-  handlePlayerHit();
-  checkFor21();
-  handleDealerHit();
-  checkFor21();
-  switchPlayerTurn();
-  checkForWinner();
+}
+
+function updateWager(evt) {
+  if (purse > 0) {
+    if (evt.target.id === 'bet') {
+      console.log(evt.target.id);
+      currentWager += 10;
+      purse -= 10;
+      currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
+      purseEl.innerText = `Purse: $${purse}`;
+    }
+  if (purse === 0) {betEl.style.visibility = 'hidden'};
+    }
 }
 
 function checkForWinner() {
-  if (pScore < 21) return;
-  if (pScore > dScore) {
+  //if (pScore < 21) return;
+  if (pScore > dScore && pScore < 21) {
     winner = true;
     currentWagerEl.innerText = "You win!"
     purse += (currentWager * 2);
-  } else {
+    turn = 'Player';
+  }
+  if (dScore > pScore && dScore < 21) {
     winner = true;
     currentWagerEl.innerText = "Dealer wins!"
     purse -= currentWager;
+    turn = 'Player';
   }
+  if (pScore > 21) {
+    winner = true;
+    purse += currentWager;
+    currentWagerEl.innerText = "You busted, dealer wins!"
+    turn = 'Player';
+  }
+  if (dScore > 21) {
+    winner = true;
+    purse += (currentWager * 2);
+    currentWagerEl.innerText = "Dealer busted, you win!"
+    turn = 'Player';
+  }
+  if (turn === 'Dealer' && dScore === pScore) {
+    winner = true;
+    purse += currentWager;
+    currentWagerEl.innerText = "Push!"
+    turn = 'Player';
+  }
+  if (winner === true){
+    revealDealerCard();
+  }
+  if (winner === false) return;
+  return purse;
 }
 
-function updateDeck() {
-  // I return currentDeck when I change deck, 
-  //  so don't think i need this...
+function revealDealerCard() {
+  const hiddenCardEl = document.getElementById('dealer-hidden-card');
+  if (hiddenCardEl === true) {
+    hiddenCardEl.outerHTML = `<div class="card ${dHand[0].face}"></div>`;
+  }
 }
 
 // Check if dealer or player has 21 before continuing hand
@@ -106,29 +141,21 @@ function checkFor21() {
     dScoreEl.innerText = 21;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
     purse -= currentWager;
+    revealDealerCard();
     return purse;
-  } else if (pScore === 21) {
+  } 
+  if (pScore === 21) {
     winner = true;
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
     currentWagerEl.innerText = "You have 21, you win!"
     purse += (currentWager * 2);
+    revealDealerCard();
     return purse;
   } else return;
 }
 
-// Bet button is visible for extra click after purse is 0 
-function updateWager(evt) {
-  if (purse > 0) {
-    if (evt.target.id === 'bet') {
-      currentWager += 10;
-      purse -= 10;
-      currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
-      purseEl.innerText = `Purse: $${purse}`;
-    }
-  } else if (purse === 0) {betEl.style.visibility = 'hidden'};
-}
 
 // Not sure I need this and could try to combine with another fn
 function switchPlayerTurn() {
@@ -138,10 +165,16 @@ function switchPlayerTurn() {
 }
 
 function dealHand() {
+  dScore = 0;
+  pScore = 0;
   dHand = [];
   pHand = [];
   dealerContainerEl.innerHTML = '';
   playerContainerEl.innerHTML = '';
+  currentWagerEl.innerText = `Current Wager: $0`;
+  hitEl.style.visibility = 'visible';
+  stayEl.style.visibility = 'visible';
+  betEl.style.visibility = 'visible';
   renderHand();
 }
 
@@ -159,39 +192,40 @@ function handlePlayerHit(evt) {
           `<div class="card ${newCard.face}"></div>` ;
         // Update player and dealer score
         pScore += newCard.value;
+        if(pScore >= 21) {
+          hitEl.style.visibility = 'hidden';
+        }
         // Only show player score
         pScoreEl.innerText = `Score: ${pScore}`;
-        return currentDeck;
       }
-    } else {
-      hitEl.style.visibility = 'hidden';
-      return;
     }
   }
-  console.log(currentDeck);
+  checkFor21()
+  return currentDeck;
 }
 
+// Dealer has to hit on anything <= 16 until total is >=17
 function handleDealerHit() {
   checkFor21();
+  turn = 'Dealer';
   if (turn === 'Dealer') {
-    if (dScore <= 16 && dScore !== 21) {
+    while (dScore <= 16 && dScore !== 21) {
       const pRndIdx = Math.floor(Math.random() * currentDeck.length);
       dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
       let lastIndex = dHand.length - 1;
       let newCard = dHand[lastIndex];
       dealerContainerEl.innerHTML += 
-        `<div class="card ${newCard.face}"></div>` ;
-      // Update player and dealer score
+      `<div class="card ${newCard.face}"></div>` ;
+      // Update dealer score
       dScore += newCard.value;
-      // Only show player score
-      return currentDeck;
+      if (dScore > 21) {
+        checkForWinner()
+        return;
+      }
     }
   }
-}
-
-// Dealer has to hit on anything <= 16 until total is >=17
-function handleDealerHit() {
-  
+  dScore.innerText = `Score: ${dScore}`
+  checkForWinner();
 }
 
 function handleMisclick(evt) {
@@ -215,11 +249,13 @@ function renderHand() {
   }
   // Update player and dealer score
   pScore = pHand[0].value + pHand[1].value;
+  dScore = dHand[0].value + dHand[1].value;
   // Only show player score
   pScoreEl.innerText = `Score: ${pScore}`;
-  dScore = dHand[0].value + dHand[1].value;
+  // Show dealer score for testing
+  dScoreEl.innerText = `Score: ${dScore}`;
   // Render initial cards on the table (except first dealer card)
-  dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" />`;
+  dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
   dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
