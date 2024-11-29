@@ -69,66 +69,12 @@ render();
 function render() {
   purseEl.innerText = `Purse: $${purse}`;
   currentWagerEl.innerText = `Current Wager: $${currentWager}`;
-  checkFor21();
-}
-
-function updateWager(evt) {
-  if (purse > 0) {
-    if (evt.target.id === 'bet') {
-      console.log(evt.target.id);
-      currentWager += 10;
-      purse -= 10;
-      currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
-      purseEl.innerText = `Purse: $${purse}`;
-    }
-  if (purse === 0) {betEl.style.visibility = 'hidden'};
-    }
-}
-
-function checkForWinner() {
-  //if (pScore < 21) return;
-  if (pScore > dScore && pScore < 21) {
-    winner = true;
-    currentWagerEl.innerText = "You win!"
-    purse += (currentWager * 2);
-    turn = 'Player';
-  }
-  if (dScore > pScore && dScore < 21) {
-    winner = true;
-    currentWagerEl.innerText = "Dealer wins!"
-    purse -= currentWager;
-    turn = 'Player';
-  }
-  if (pScore > 21) {
-    winner = true;
-    purse += currentWager;
-    currentWagerEl.innerText = "You busted, dealer wins!"
-    turn = 'Player';
-  }
-  if (dScore > 21) {
-    winner = true;
-    purse += (currentWager * 2);
-    currentWagerEl.innerText = "Dealer busted, you win!"
-    turn = 'Player';
-  }
-  if (turn === 'Dealer' && dScore === pScore) {
-    winner = true;
-    purse += currentWager;
-    currentWagerEl.innerText = "Push!"
-    turn = 'Player';
-  }
-  if (winner === true){
-    revealDealerCard();
-  }
-  if (winner === false) return;
-  return purse;
-}
-
-function revealDealerCard() {
-  const hiddenCardEl = document.getElementById('dealer-hidden-card');
-  if (hiddenCardEl === true) {
-    hiddenCardEl.outerHTML = `<div class="card ${dHand[0].face}"></div>`;
-  }
+  dealerContainerEl.innerHTML = '';
+  playerContainerEl.innerHTML = '';
+  dScore = 0;
+  pScore = 0;
+  dScoreEl.innerText = `Score:`;
+  pScoreEl.innerText = `Score:`;
 }
 
 // Check if dealer or player has 21 before continuing hand
@@ -138,7 +84,7 @@ function checkFor21() {
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
-    dScoreEl.innerText = 21;
+    dScoreEl.innerText = `Score: 21`;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
     purse -= currentWager;
     revealDealerCard();
@@ -156,13 +102,71 @@ function checkFor21() {
   } else return;
 }
 
-
-// Not sure I need this and could try to combine with another fn
-function switchPlayerTurn() {
-  // If the player hits stay the goes to dealer
-  turn = 'Dealer';
-  //allBtnEl.style.visibility = 'hidden';
+function updateWager(evt) {
+  if (purse > 0) {
+    if (evt.target.id === 'bet') {
+      console.log(evt.target.id);
+      currentWager += 10;
+      purse -= 10;
+      currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
+      purseEl.innerText = `Purse: $${purse}`;
+    }
+  if (purse === 0) {betEl.style.visibility = 'hidden'};
+    }
 }
+
+function checkForWinner() {
+    if (turn === 'Dealer') {
+    if (pScore > dScore && pScore < 21) {
+      winner = true;
+      currentWagerEl.innerText = "You win!"
+      purse += (currentWager * 2);
+      turn = 'Player';
+    }
+    if (dScore > pScore && dScore < 21) {
+      winner = true;
+      currentWagerEl.innerText = "Dealer wins!"
+      purse -= currentWager;
+      turn = 'Player';
+    }
+    if (pScore > 21) {
+      winner = true;
+      purse += currentWager;
+      currentWagerEl.innerText = "You busted, dealer wins!"
+      turn = 'Player';
+    }
+    if (dScore > 21) {
+      winner = true;
+      purse += (currentWager * 2);
+      currentWagerEl.innerText = "Dealer busted, you win!"
+      turn = 'Player';
+    }
+    if (dScore === pScore) {
+      winner = true;
+      purse += currentWager;
+      currentWagerEl.innerText = "Push!"
+      turn = 'Player';
+    }
+  }
+  if (winner === false) return;
+  if (turn === 'Player' && pScore > 21) {
+    winner = true;
+    currentWagerEl.innerText = "You busted, dealer wins!";
+  }
+  if (winner === true){
+    revealDealerCard();
+  }
+  return purse;
+}
+
+function revealDealerCard() {
+  const hiddenCardEl = document.getElementById('dealer-hidden-card');
+  if (hiddenCardEl) {
+    hiddenCardEl.outerHTML = `<div class="card ${dHand[0].face}"></div>`;
+  }
+}
+
+
 
 function dealHand() {
   dScore = 0;
@@ -176,6 +180,7 @@ function dealHand() {
   stayEl.style.visibility = 'visible';
   betEl.style.visibility = 'visible';
   renderHand();
+  checkFor21();
 }
 
 // Hit button staying visible one click past 
@@ -198,9 +203,12 @@ function handlePlayerHit(evt) {
         // Only show player score
         pScoreEl.innerText = `Score: ${pScore}`;
       }
+    } else if (pScore > 21) {
+      turn = 'Dealer';
+      checkForWinner();
     }
   }
-  checkFor21()
+  checkFor21();
   return currentDeck;
 }
 
