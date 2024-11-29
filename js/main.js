@@ -35,15 +35,15 @@ let hitEl = document.querySelector('#hit');
 let betEl = document.querySelector('#bet');
 let playEl = document.querySelector('#play');
 let allBtnEl = document.querySelectorAll('.btn');
+let dealEl = document.querySelector('#deal');
 
 /*--------------- event listeners --------------*/
 document.querySelector('section').addEventListener('click', handleMisclick);
 stayEl.addEventListener('click', handleDealerHit);
-playEl.addEventListener('click', handlePlayerHit, render);
+playEl.addEventListener('click', init);
 hitEl.addEventListener('click', handlePlayerHit);
-// document.querySelector('#bet').addEventListener('click', updateWager);
 betEl.addEventListener('click', updateWager);
-document.querySelector('#deal').addEventListener('click', dealHand);
+dealEl.addEventListener('click', dealHand);
 
 /*--------------- functions ---------------*/
 
@@ -57,7 +57,9 @@ function init() {
   turn = 'Player';
   dHand = [];
   pHand = [];
-
+  stayEl.style.visibility = 'hidden';
+  hitEl.style.visibility = 'hidden';
+  // dealEl.style.visibility = 'hidden';
   render();
 }
 
@@ -171,18 +173,22 @@ function revealDealerCard() {
 
 
 function dealHand() {
-  dScore = 0;
-  pScore = 0;
-  dHand = [];
-  pHand = [];
-  dealerContainerEl.innerHTML = '';
-  playerContainerEl.innerHTML = '';
-  currentWagerEl.innerText = `Current Wager: $0`;
-  hitEl.style.visibility = 'visible';
-  stayEl.style.visibility = 'visible';
-  betEl.style.visibility = 'visible';
-  renderHand();
-  checkFor21();
+  if (currentWager == 0) {
+    currentWagerEl.innerText = `You must place a bet before you start.`
+  } else {
+    dScore = 0;
+    pScore = 0;
+    dHand = [];
+    pHand = [];
+    dealerContainerEl.innerHTML = '';
+    playerContainerEl.innerHTML = '';
+    currentWagerEl.innerText = `Current Wager: $0`;
+    hitEl.style.visibility = 'visible';
+    stayEl.style.visibility = 'visible';
+    betEl.style.visibility = 'visible';
+    renderHand();
+    checkFor21();
+  }
 }
 
 // Hit button staying visible one click past 
@@ -244,7 +250,6 @@ function handleDealerHit() {
 function handleMisclick(evt) {
   if (evt.target.class !== 'btn') return;
 }
-
 
 function renderHand() {
   // Creating copy of original deck
