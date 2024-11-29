@@ -60,7 +60,8 @@ function init() {
   playEl.style.visibility = 'hidden';
   stayEl.style.visibility = 'hidden';
   hitEl.style.visibility = 'hidden';
-  // dealEl.style.visibility = 'hidden';
+  dealEl.style.visibility = 'visible';
+  betEl.style.visibility = 'visible';
   render();
 }
 
@@ -169,6 +170,7 @@ function checkForWinner() {
       dealEl.style.visibility = 'hidden';
     }
   }
+  dealEl.style.visibility = 'visible'
   return purse;
 }
 
@@ -263,9 +265,7 @@ function handleMisclick(evt) {
 function renderHand() {
   // Creating copy of original deck
   const tempDeck = [...originalDeck];
-  // Create arrays for dealer and player hands
-  // let dHand = [];
-  // let pHand = [];
+  dealEl.style.visibility = 'hidden';
   // Deal player and dealer 2 random cards ensuring can't receive
   //  exact same cards
   while (dHand.length < 2) {
