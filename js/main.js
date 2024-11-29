@@ -57,6 +57,7 @@ function init() {
   turn = 'Player';
   dHand = [];
   pHand = [];
+  playEl.style.visibility = 'hidden';
   stayEl.style.visibility = 'hidden';
   hitEl.style.visibility = 'hidden';
   // dealEl.style.visibility = 'hidden';
@@ -94,7 +95,7 @@ function checkFor21() {
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
-    currentWagerEl.innerText = `You have 21, you win $${currentWager * 2}!`
+    currentWagerEl.innerText = `You have 21, you win $${currentWager}!`
     purse += (currentWager * 2);
     revealDealerCard();
     return purse;
@@ -119,7 +120,7 @@ function checkForWinner() {
   if (turn === 'Dealer') {
   if (pScore > dScore && pScore < 21) {
     winner = true;
-    currentWagerEl.innerText = `You win $${currentWager * 2}!`
+    currentWagerEl.innerText = `You win $${currentWager}!`
     purse += (currentWager * 2);
     turn = 'Player';
     currentWager = 0;
@@ -139,7 +140,7 @@ function checkForWinner() {
   if (dScore > 21) {
     winner = true;
     purse += (currentWager * 2);
-    currentWagerEl.innerText = `Dealer busted, you win $${currentWager * 2}!`
+    currentWagerEl.innerText = `Dealer busted, you win $${currentWager}!`
     turn = 'Player';
     currentWager = 0;
   }
@@ -161,7 +162,12 @@ function checkForWinner() {
     revealDealerCard();
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
-    return purse;
+    if (purse === 0) {
+      currentWagerEl.innerText = "Game over!"
+      playEl.style.visibility = 'visible';
+      betEl.style.visibility = 'hidden';
+      dealEl.style.visibility = 'hidden';
+    }
   }
   return purse;
 }
@@ -218,8 +224,6 @@ function handlePlayerHit(evt) {
       }
     } 
     if (pScore > 21) {
-      // turn = 'Dealer';
-      // checkForWinner();
       handleDealerHit();
     }
   }
@@ -276,7 +280,7 @@ function renderHand() {
   // Only show player score
   pScoreEl.innerText = `Score: ${pScore}`;
   // Show dealer score for testing
-  dScoreEl.innerText = `Score: ${dScore}`;
+  // dScoreEl.innerText = `Score: ${dScore}`;
   // Render initial cards on the table (except first dealer card)
   dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
   dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
