@@ -13,7 +13,6 @@ let dScore;
 let purse;
 let currentWager;
 let winner;
-let tie;
 let turn;
 let shuffledDeck;
 let dHand;
@@ -55,7 +54,6 @@ function init() {
   purse = 100;
   currentWager = 0;
   winner = false;
-  tie = false;
   turn = 'Player';
   dHand = [];
   pHand = [];
@@ -116,37 +114,38 @@ function updateWager(evt) {
 }
 
 function checkForWinner() {
-    if (turn === 'Dealer') {
-    if (pScore > dScore && pScore < 21) {
-      winner = true;
-      currentWagerEl.innerText = "You win!"
-      purse += (currentWager * 2);
-      turn = 'Player';
-    }
-    if (dScore > pScore && dScore < 21) {
-      winner = true;
-      currentWagerEl.innerText = "Dealer wins!"
-      purse -= currentWager;
-      turn = 'Player';
-    }
-    if (pScore > 21) {
-      winner = true;
-      purse += currentWager;
-      currentWagerEl.innerText = "You busted, dealer wins!"
-      turn = 'Player';
-    }
-    if (dScore > 21) {
-      winner = true;
-      purse += (currentWager * 2);
-      currentWagerEl.innerText = "Dealer busted, you win!"
-      turn = 'Player';
-    }
-    if (dScore === pScore) {
-      winner = true;
-      purse += currentWager;
-      currentWagerEl.innerText = "Push!"
-      turn = 'Player';
-    }
+  checkFor21();
+  if (turn === 'Dealer') {
+  if (pScore > dScore && pScore < 21) {
+    winner = true;
+    currentWagerEl.innerText = "You win!"
+    purse += (currentWager * 2);
+    turn = 'Player';
+  }
+  if (dScore > pScore && dScore < 21) {
+    winner = true;
+    currentWagerEl.innerText = "Dealer wins!"
+    purse -= currentWager;
+    turn = 'Player';
+  }
+  if (pScore > 21) {
+    winner = true;
+    purse += currentWager;
+    currentWagerEl.innerText = "You busted, dealer wins!"
+    turn = 'Player';
+  }
+  if (dScore > 21) {
+    winner = true;
+    purse += (currentWager * 2);
+    currentWagerEl.innerText = "Dealer busted, you win!"
+    turn = 'Player';
+  }
+  if (dScore === pScore) {
+    winner = true;
+    purse += currentWager;
+    currentWagerEl.innerText = "Push!"
+    turn = 'Player';
+  }
   }
   if (winner === false) return;
   if (turn === 'Player' && pScore > 21) {
@@ -155,6 +154,9 @@ function checkForWinner() {
   }
   if (winner === true){
     revealDealerCard();
+    betEl.style.visibility = 'hidden';
+    stayEl.style.visibility = 'hidden';
+    hitEl.style.visibility = 'hidden';
   }
   return purse;
 }
@@ -203,9 +205,11 @@ function handlePlayerHit(evt) {
         // Only show player score
         pScoreEl.innerText = `Score: ${pScore}`;
       }
-    } else if (pScore > 21) {
-      turn = 'Dealer';
-      checkForWinner();
+    } 
+    if (pScore > 21) {
+      // turn = 'Dealer';
+      // checkForWinner();
+      handleDealerHit();
     }
   }
   checkFor21();
@@ -216,7 +220,7 @@ function handlePlayerHit(evt) {
 function handleDealerHit() {
   checkFor21();
   turn = 'Dealer';
-  if (turn === 'Dealer') {
+  if (turn === 'Dealer' && pScore < 21) {
     while (dScore <= 16 && dScore !== 21) {
       const pRndIdx = Math.floor(Math.random() * currentDeck.length);
       dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
@@ -227,12 +231,13 @@ function handleDealerHit() {
       // Update dealer score
       dScore += newCard.value;
       if (dScore > 21) {
+        dScoreEl.innerText = `Score: ${dScore}`
         checkForWinner()
         return;
       }
     }
   }
-  dScore.innerText = `Score: ${dScore}`
+  dScoreEl.innerText = `Score: ${dScore}`
   checkForWinner();
 }
 
