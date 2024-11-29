@@ -86,7 +86,6 @@ function checkFor21() {
     hitEl.style.visibility = 'hidden';
     dScoreEl.innerText = `Score: 21`;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
-    purse -= currentWager;
     revealDealerCard();
     return purse;
   } 
@@ -95,7 +94,7 @@ function checkFor21() {
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
-    currentWagerEl.innerText = "You have 21, you win!"
+    currentWagerEl.innerText = `You have 21, you win $${currentWager * 2}!`
     purse += (currentWager * 2);
     revealDealerCard();
     return purse;
@@ -120,45 +119,49 @@ function checkForWinner() {
   if (turn === 'Dealer') {
   if (pScore > dScore && pScore < 21) {
     winner = true;
-    currentWagerEl.innerText = "You win!"
+    currentWagerEl.innerText = `You win $${currentWager * 2}!`
     purse += (currentWager * 2);
     turn = 'Player';
+    currentWager = 0;
   }
   if (dScore > pScore && dScore < 21) {
     winner = true;
     currentWagerEl.innerText = "Dealer wins!"
-    purse -= currentWager;
     turn = 'Player';
+    currentWager = 0;
   }
   if (pScore > 21) {
     winner = true;
-    purse += currentWager;
     currentWagerEl.innerText = "You busted, dealer wins!"
     turn = 'Player';
+    currentWager = 0;
   }
   if (dScore > 21) {
     winner = true;
     purse += (currentWager * 2);
-    currentWagerEl.innerText = "Dealer busted, you win!"
+    currentWagerEl.innerText = `Dealer busted, you win $${currentWager * 2}!`
     turn = 'Player';
+    currentWager = 0;
   }
   if (dScore === pScore) {
     winner = true;
     purse += currentWager;
     currentWagerEl.innerText = "Push!"
     turn = 'Player';
+    currentWager = 0;
   }
   }
   if (winner === false) return;
   if (turn === 'Player' && pScore > 21) {
     winner = true;
     currentWagerEl.innerText = "You busted, dealer wins!";
+    currentWager = 0;
   }
   if (winner === true){
     revealDealerCard();
-    betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
+    return purse;
   }
   return purse;
 }
@@ -173,6 +176,7 @@ function revealDealerCard() {
 
 
 function dealHand() {
+  render();
   if (currentWager == 0) {
     currentWagerEl.innerText = `You must place a bet before you start.`
   } else {
@@ -186,6 +190,7 @@ function dealHand() {
     hitEl.style.visibility = 'visible';
     stayEl.style.visibility = 'visible';
     betEl.style.visibility = 'visible';
+    playEl.innerText = 'Reset';
     renderHand();
     checkFor21();
   }
