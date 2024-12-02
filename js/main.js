@@ -92,13 +92,20 @@ function render() {
   pScoreEl.innerText = `Score:`;
 }
 
+function hideButtons() {
+  if (winner === true) {
+    stayEl.style.visibility = 'hidden';
+    hitEl.style.visibility = 'hidden';
+  } else return;
+}
+
 // Check if dealer or player has 21 before continuing hand
 function checkFor21() {
   if (dScore === 21 && pScore !== 21) {
     winner = true;
-    // betEl.style.visibility = 'hidden';
-    stayEl.style.visibility = 'hidden';
-    hitEl.style.visibility = 'hidden';
+    // stayEl.style.visibility = 'hidden';
+    // hitEl.style.visibility = 'hidden';
+    hideButtons();
     dScoreEl.innerText = `Score: 21`;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
     dealEl.style.visibility = 'visible';
@@ -107,8 +114,9 @@ function checkFor21() {
     return purse;
   } else if (pScore === 21 && dScore !== 21) {
     winner = true;
-    stayEl.style.visibility = 'hidden';
-    hitEl.style.visibility = 'hidden';
+    // stayEl.style.visibility = 'hidden';
+    // hitEl.style.visibility = 'hidden';
+    hideButtons();
     currentWagerEl.innerText = `You have 21, you win $${currentWager * 1.5}!`
     purse += (currentWager + (currentWager * 1.5));
     dealEl.style.visibility = 'visible';
@@ -117,8 +125,9 @@ function checkFor21() {
     return purse;
   } else if (pScore === 21 && dScore === 21) {
     winner = true;
-    stayEl.style.visibility = 'hidden';
-    hitEl.style.visibility = 'hidden';
+    // stayEl.style.visibility = 'hidden';
+    // hitEl.style.visibility = 'hidden';
+    hideButtons();
     currentWagerEl.innerText = `You both have 21, push!`
     purse += currentWager;
     dealEl.style.visibility = 'visible';
@@ -180,8 +189,9 @@ function checkForWinner() {
   }
   if (winner === true){
     revealDealerCard();
-    stayEl.style.visibility = 'hidden';
-    hitEl.style.visibility = 'hidden';
+    // stayEl.style.visibility = 'hidden';
+    // hitEl.style.visibility = 'hidden';
+    hideButtons();
     if (purse === 0) {
       currentWagerEl.innerText = "You ran out of money. Game over!"
       playEl.style.visibility = 'visible';
@@ -199,8 +209,6 @@ function revealDealerCard() {
     hiddenCardEl.outerHTML = `<div class="card ${dHand[0].face}"></div>`;
   }
 }
-
-
 
 function dealHand() {
   render();
@@ -221,7 +229,6 @@ function dealHand() {
     playEl.innerText = 'Reset';
     renderHand();
     checkFor21();
-    
   }
 }
 
@@ -239,7 +246,6 @@ function handlePlayerHit(evt) {
         pScore = getHandTotal(pHand);
         // Only show player score
         pScoreEl.innerText = `Score: ${pScore}`;
-        // }
         if (pScore >= 21) {
           hitEl.style.visibility = 'hidden';
         }
@@ -345,5 +351,3 @@ function buildOriginalDeck() {
 // 2. When dealt 2 aces, it defaults to 22 and player busts
 // 3. Lots of button hiding and visibility
 // 4. Don't really have a 'state' - everything is mostly hard-coded
-// 5. Purse is not updating immediately after game
-// 6. Score didn't reset between 
