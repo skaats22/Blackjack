@@ -46,7 +46,6 @@ dealEl.addEventListener('click', dealHand);
 
 /*--------------- functions ---------------*/
 
-
 function init() {
   pScore = 0;
   dScore = 0;
@@ -67,6 +66,7 @@ function init() {
 init();
 render();
 
+// Credit Jim Clark
 function getHandTotal(hand) {
   let total = 0;
   let aces = 0;
@@ -142,39 +142,35 @@ function updateWager(evt) {
 function checkForWinner() {
   checkFor21();
   if (turn === 'Dealer') {
-  if (pScore > dScore && pScore < 21) {
-    winner = true;
-    currentWagerEl.innerText = `You win $${currentWager}!`
-    purse += (currentWager * 2);
-    turn = 'Player';
-    currentWager = 0;
-  }
-  if (dScore > pScore && dScore < 21) {
-    winner = true;
-    currentWagerEl.innerText = "Dealer wins!"
-    turn = 'Player';
-    currentWager = 0;
-  }
-  if (pScore > 21) {
-    winner = true;
-    currentWagerEl.innerText = "You busted, dealer wins!"
-    turn = 'Player';
-    currentWager = 0;
-  }
-  if (dScore > 21) {
-    winner = true;
-    purse += (currentWager * 2);
-    currentWagerEl.innerText = `Dealer busted, you win $${currentWager}!`
-    turn = 'Player';
-    currentWager = 0;
-  }
-  if (dScore === pScore) {
-    winner = true;
-    purse += currentWager;
-    currentWagerEl.innerText = "Push!"
-    turn = 'Player';
-    currentWager = 0;
-  }
+    if (pScore > dScore && pScore < 21) {
+      winner = true;
+      currentWagerEl.innerText = `You win $${currentWager}!`
+      purse += (currentWager * 2);
+      turn = 'Player';
+      currentWager = 0;
+    } else if (dScore > pScore && dScore < 21) {
+      winner = true;
+      currentWagerEl.innerText = "Dealer wins!"
+      turn = 'Player';
+      currentWager = 0;
+    } else if (pScore > 21) {
+      winner = true;
+      currentWagerEl.innerText = "You busted, dealer wins!"
+      turn = 'Player';
+      currentWager = 0;
+    } else if (dScore > 21) {
+      winner = true;
+      purse += (currentWager * 2);
+      currentWagerEl.innerText = `Dealer busted, you win $${currentWager}!`
+      turn = 'Player';
+      currentWager = 0;
+    } else if (dScore === pScore) {
+      winner = true;
+      purse += currentWager;
+      currentWagerEl.innerText = "Push!"
+      turn = 'Player';
+      currentWager = 0;
+    }
   }
   if (winner === false) return;
   if (turn === 'Player' && pScore > 21) {
@@ -210,6 +206,7 @@ function dealHand() {
   render();
   if (currentWager == 0) {
     currentWagerEl.innerText = `You must place a bet before you start.`
+    betEl.style.visibility = 'visible';
   } else {
     dScore = 0;
     pScore = 0;
@@ -220,10 +217,11 @@ function dealHand() {
     currentWagerEl.innerText = `Current Wager: $${currentWager}`;
     hitEl.style.visibility = 'visible';
     stayEl.style.visibility = 'visible';
-    betEl.style.visibility = 'visible';
+    betEl.style.visibility = 'hidden';
     playEl.innerText = 'Reset';
     renderHand();
     checkFor21();
+    
   }
 }
 
@@ -341,3 +339,11 @@ function buildOriginalDeck() {
 // If a state is true 
 // Maybe there's a helper function that you can create to check something
 // and trigger something, so don't have to repeat same line of code
+
+// Current issues needing to be resolved:
+// 1. Need to hit deal to reset, then bet to keep going
+// 2. When dealt 2 aces, it defaults to 22 and player busts
+// 3. Lots of button hiding and visibility
+// 4. Don't really have a 'state' - everything is mostly hard-coded
+// 5. Purse is not updating immediately after game
+// 6. Score didn't reset between 
