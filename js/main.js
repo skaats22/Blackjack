@@ -14,28 +14,27 @@ let purse;
 let currentWager;
 let winner;
 let turn;
-let shuffledDeck;
 let dHand;
 let pHand;
 let currentDeck;
 
 /*--------------- cached elements  ---------------*/
 // Card container elements
-let dealerContainerEl = document.querySelector('.dealer-cards');
-let playerContainerEl = document.querySelector('.player-cards');
+const dealerContainerEl = document.querySelector('.dealer-cards');
+const playerContainerEl = document.querySelector('.player-cards');
 // Player score and dealer score elements
-let pScoreEl = document.querySelector('#player-score');
-let dScoreEl = document.querySelector('#dealer-score');
+const pScoreEl = document.querySelector('#player-score');
+const dScoreEl = document.querySelector('#dealer-score');
 // Purse and wager elements
-let purseEl = document.querySelector('#purse');
-let currentWagerEl = document.querySelector('#wager');
+const purseEl = document.querySelector('#purse');
+const currentWagerEl = document.querySelector('#wager');
 // Button elements
-let stayEl = document.querySelector('#stay');
-let hitEl = document.querySelector('#hit');
-let betEl = document.querySelector('#bet');
-let playEl = document.querySelector('#play');
-let allBtnEl = document.querySelectorAll('.btn');
-let dealEl = document.querySelector('#deal');
+const stayEl = document.querySelector('#stay');
+const hitEl = document.querySelector('#hit');
+const betEl = document.querySelector('#bet');
+const playEl = document.querySelector('#play');
+const allBtnEl = document.querySelectorAll('.btn');
+const dealEl = document.querySelector('#deal');
 
 /*--------------- event listeners --------------*/
 document.querySelector('section').addEventListener('click', handleMisclick);
@@ -68,6 +67,20 @@ function init() {
 init();
 render();
 
+function getHandTotal(hand) {
+  let total = 0;
+  let aces = 0;
+  hand.forEach(function(card) {
+    total += card.value;
+    if (card.value === 11) aces++;
+  });
+  while (total > 21 && aces) {
+    total -= 10;
+    aces--;
+  }
+  return total;
+}
+
 function render() {
   purseEl.innerText = `Purse: $${purse}`;
   currentWagerEl.innerText = `Current Wager: $${currentWager}`;
@@ -83,29 +96,27 @@ function render() {
 function checkFor21() {
   if (dScore === 21 && pScore !== 21) {
     winner = true;
-    betEl.style.visibility = 'hidden';
+    // betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
     dScoreEl.innerText = `Score: 21`;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
     dealEl.style.visibility = 'visible';
+    currentWager = 0;
     revealDealerCard();
     return purse;
-  } 
-  if (pScore === 21 && dScore !== 21) {
+  } else if (pScore === 21 && dScore !== 21) {
     winner = true;
-    betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
-    currentWagerEl.innerText = `You have 21, you win $${currentWager}!`
-    purse += (currentWager * 2);
+    currentWagerEl.innerText = `You have 21, you win $${currentWager * 1.5}!`
+    purse += (currentWager + (currentWager * 1.5));
     dealEl.style.visibility = 'visible';
+    currentWager = 0;
     revealDealerCard();
     return purse;
-  }
-  if (pScore === 21 && dScore === 21) {
+  } else if (pScore === 21 && dScore === 21) {
     winner = true;
-    betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
     currentWagerEl.innerText = `You both have 21, push!`
@@ -125,8 +136,7 @@ function updateWager(evt) {
       currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
       purseEl.innerText = `Purse: $${purse}`;
     }
-  if (purse === 0) {betEl.style.visibility = 'hidden'};
-    }
+  } else if (purse === 0) {betEl.style.visibility = 'hidden'};
 }
 
 function checkForWinner() {
@@ -177,7 +187,7 @@ function checkForWinner() {
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
     if (purse === 0) {
-      currentWagerEl.innerText = "Game over!"
+      currentWagerEl.innerText = "You ran out of money. Game over!"
       playEl.style.visibility = 'visible';
       betEl.style.visibility = 'hidden';
       dealEl.style.visibility = 'hidden';
@@ -207,7 +217,7 @@ function dealHand() {
     pHand = [];
     dealerContainerEl.innerHTML = '';
     playerContainerEl.innerHTML = '';
-    currentWagerEl.innerText = `Current Wager: $0`;
+    currentWagerEl.innerText = `Current Wager: $${currentWager}`;
     hitEl.style.visibility = 'visible';
     stayEl.style.visibility = 'visible';
     betEl.style.visibility = 'visible';
@@ -217,7 +227,6 @@ function dealHand() {
   }
 }
 
-// Hit button staying visible one click past 
 function handlePlayerHit(evt) {
   checkFor21();
   if (turn === 'Player') {
@@ -229,13 +238,13 @@ function handlePlayerHit(evt) {
         let newCard = pHand[lastIndex];
         playerContainerEl.innerHTML += 
           `<div class="card ${newCard.face}"></div>` ;
-        // Update player and dealer score
-        pScore += newCard.value;
-        if(pScore >= 21) {
-          hitEl.style.visibility = 'hidden';
-        }
+        pScore = getHandTotal(pHand);
         // Only show player score
         pScoreEl.innerText = `Score: ${pScore}`;
+        // }
+        if (pScore >= 21) {
+          hitEl.style.visibility = 'hidden';
+        }
       }
     } 
     if (pScore > 21) {
@@ -259,7 +268,7 @@ function handleDealerHit() {
       dealerContainerEl.innerHTML += 
       `<div class="card ${newCard.face}"></div>` ;
       // Update dealer score
-      dScore += newCard.value;
+      dScore = getHandTotal(dHand);
       if (dScore > 21) {
         dScoreEl.innerText = `Score: ${dScore}`
         checkForWinner()
@@ -327,3 +336,8 @@ function buildOriginalDeck() {
 // Have a full reset function that clears all state
 
 // For ace, build in logic only if hit
+
+
+// If a state is true 
+// Maybe there's a helper function that you can create to check something
+// and trigger something, so don't have to repeat same line of code
