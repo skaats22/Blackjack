@@ -81,23 +81,36 @@ function render() {
 
 // Check if dealer or player has 21 before continuing hand
 function checkFor21() {
-  if (dScore === 21) {
+  if (dScore === 21 && pScore !== 21) {
     winner = true;
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
     dScoreEl.innerText = `Score: 21`;
     currentWagerEl.innerText = "Dealer has 21, you lose!"
+    dealEl.style.visibility = 'visible';
     revealDealerCard();
     return purse;
   } 
-  if (pScore === 21) {
+  if (pScore === 21 && dScore !== 21) {
     winner = true;
     betEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
     hitEl.style.visibility = 'hidden';
     currentWagerEl.innerText = `You have 21, you win $${currentWager}!`
     purse += (currentWager * 2);
+    dealEl.style.visibility = 'visible';
+    revealDealerCard();
+    return purse;
+  }
+  if (pScore === 21 && dScore === 21) {
+    winner = true;
+    betEl.style.visibility = 'hidden';
+    stayEl.style.visibility = 'hidden';
+    hitEl.style.visibility = 'hidden';
+    currentWagerEl.innerText = `You both have 21, push!`
+    purse += currentWager;
+    dealEl.style.visibility = 'visible';
     revealDealerCard();
     return purse;
   } else return;
