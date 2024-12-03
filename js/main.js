@@ -78,41 +78,36 @@ function renderBoard() {
   msgEl.innerText = MSG_LOOKUP[outcome];
   dealerContainerEl.innerHTML = '';
   playerContainerEl.innerHTML = '';
+  renderControls();
 }
 
 // 
 function handInPlay() {
-  if (outcome === null) {
-    return;
-  } else if (outcome !== null){
-    handleDealerHit();
-  }
+  const inPlay = pHand.length > 0 && !outcome;
+  console.log(`pHand.length: ${pHand.length}, outcome: ${outcome}, inPlay: ${inPlay}`);
+  return inPlay;
 }
 
 function renderControls() {
-  // If hand is in play, then hide deal button, otherwise show it
-  handOverEl.style.visibility = handInPlay() ? 'hidden' : 'visible';
+  console.log(`Hand In Play: ${handInPlay()}`);
+  console.log(`Deal Button Visibility: ${dealEl.style.visibility}`);
   // If current wager is >= 10 and the hand is not in play, 
   //  the button will be visible, otherwise hidden
-  dealEl.style.visibility = currentWager >= 10 && !handInPlay() ? 'visibile' : 'hidden';
+  dealEl.style.visibility = currentWager >= 10 && !handInPlay() ? 'visible' : 'hidden';
+  // If hand is in play, then hide deal button, otherwise show it
+  // dealEl.style.visibility = handInPlay() ? 'hidden' : 'visible';
   // If the hand is in play, then show handActive buttons
-  handActiveEl.style.visibility = handInPlay() ? 'visibile' : 'hidden';
+  hitEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
+  stayEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
 }
 
 function render() {
-  renderHand();
+  // renderHand();
   currentWagerEl.innerHTML = `Current Wager: ${currentWager}`;
   purseEl.innerText = `Purse: $${purse}`;
+  renderBoard();
+  msgEl.innerHTML = MSG_LOOKUP[outcome];
   renderControls();
-}
-
-function settleBet() {
-  if (outcome === 'PBJ') {
-    purse += currentWager + (currentWager * 1.5);
-  } else if (outcome === 'P') {
-    purse += bet * 2;
-  }
-  currentWager = 0;
 }
 
 // Credit Jim Clark
@@ -134,40 +129,46 @@ function getHandTotal(hand) {
 function checkFor21() {
   if (dScore === 21 && pScore === 21) {
     outcome = 'T';
-    return outcome;
+    revealDealerCard();
   } else if (dScore === 21) {
     outcome = 'DBJ';
-    return outcome;
+    msgEl.innerText = MSG_LOOKUP[outcome];
+    revealDealerCard();
   } else if (pScore === 21) {
     outcome = 'PBJ';
-    return outcome;
-  } else return;
+    msgEl.innerText = MSG_LOOKUP[outcome];
+    revealDealerCard();
+  } 
 }
 
 function checkForWinner() {
-  if (pScore > 21 || dScore > pScore) {
+  if (dScore < 21 && dScore > pScore) {
     outcome = 'D';
-  } else if (dScore > 21 || pScore > dScore) {
+  } else if (pScore < 21 && pScore > dScore) {
     outcome = 'P';
   } else if (pScore === dScore) {
     outcome = 'T';
   } 
+  settleBet();
 }
 
-function handleMessage(outcome) {
-    msgEl.innerHTML = MSG_LOOKUP[outcome];
+function updateWager() {
+  if (purse >= 10) {
+    currentWager += 10;
+    purse -= 10;
+  }
+  if (purse < 10) {betEl.style.visibility = 'hidden'};
+  currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
+  purseEl.innerText = `Purse: $${purse}`;
 }
 
-function updateWager(evt) {
-  if (purse > 0) {
-    if (evt.target.id === 'bet') {
-      console.log(evt.target.id);
-      currentWager += 10;
-      purse -= 10;
-      currentWagerEl.innerText = `Current Wager: $${currentWager}`;    
-      purseEl.innerText = `Purse: $${purse}`;
-    }
-  } else if (purse === 0) {betEl.style.visibility = 'hidden'};
+function settleBet() {
+  if (outcome === 'PBJ') {
+    purse += currentWager + (currentWager * 1.5);
+  } else if (outcome === 'P') {
+    purse += currentWager * 2;
+  }
+  currentWager = 0;
 }
 
 function revealDealerCard() {
@@ -195,14 +196,20 @@ function dealHand() {
   pScore = getHandTotal(pHand);
   dScore = getHandTotal(dHand);
   pScoreEl.innerText = `Score: ${pScore}`;
-  // Show dealer score for testing
   // Render initial cards on the table (except first dealer card)
   dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
   dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
+  if (dScore === 21 && pScore === 21) {
+    outcome = 'T';
+  } else if (dScore === 21) {
+    outcome = 'DBJ';
+  } else if (pScore === 21) {
+    outcome = 'PBJ';
+  }
+  if (outcome) settleBet();
   currentDeck = tempDeck;
-  checkFor21();
   return currentDeck;
 }
 
@@ -211,19 +218,16 @@ function handlePlayerHit() {
   pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
   let lastIndex = pHand.length - 1;
   let newCard = pHand[lastIndex];
-  console.log(pScore);
   playerContainerEl.innerHTML += 
   `<div class="card ${newCard.face}"></div>` ;
   pScore = getHandTotal(pHand);
   // Only show player score
-  pScoreEl.innerText = `Score: ${pScore}`;
-  
+  pScoreEl.innerText = `Score: ${pScore}`;  
   if (pScore > 21) {
-    outcome = 'D'
-    handleDealerHit();
+    outcome = 'D';
+    settleBet();
   }
   checkFor21();
-  renderControls();
   return pHand;
 }
 
@@ -241,17 +245,17 @@ function handleDealerHit() {
     }
   }
   // Update dealer score
-  dScoreEl.innerText = `Score: ${dScore}`
+  dScoreEl.innerText = `Score: ${dScore}`;
+  if (dScore > 21) {
+    outcome = 'P';
+  }
   revealDealerCard();
   checkFor21();
   checkForWinner();
-  handleMessage(outcome);
 }
 
 function renderHand() {
-  // Show dealer score for testing
   // Render initial cards on the table (except first dealer card)
-  // dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
   for (let i = 0; i < dHand.length; i++) {
     dealerContainerEl.innerHTML += `<div class="card ${dHand[i].face}"></div>` ;
   }
@@ -284,7 +288,6 @@ function buildOriginalDeck() {
 
 // Current issues needing to be resolved:
 // 1. Need to hit deal to reset, then bet to keep going
-// 2. When dealt 2 aces, it defaults to 22 and player busts
 // 3. Lots of button hiding and visibility
 // 4. Don't really have a 'state' - everything is mostly hard-coded
 // 5. Purse can go below 0 if I have a 5 from a blackjack win
