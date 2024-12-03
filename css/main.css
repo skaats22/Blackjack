@@ -9,6 +9,15 @@ section {
 
 h3 {
   margin: 10px 10px;
+  font-size: 28px;
+}
+
+#message {
+  font-size: 44px;
+  text-align: center;
+  margin: 10px;
+  text-decoration: underline;
+
 }
 
 #table {
