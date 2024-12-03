@@ -140,13 +140,6 @@ function render() {
   pScoreEl.innerText = `Score:`;
 }
 
-function hideButtons() {
-  if (winner === true) {
-    stayEl.style.visibility = 'hidden';
-    hitEl.style.visibility = 'hidden';
-  } else return;
-}
-
 // Check if dealer or player has 21 before continuing hand
 function checkFor21() {
   if (dScore === 21 && pScore === 21) {
@@ -156,6 +149,20 @@ function checkFor21() {
   } else if (pScore === 21) {
     outcome = 'PBJ';
   } else return;
+}
+
+function checkForWinner() {
+  if (pScore > 21) {
+    outcome = 'D';
+  } else if (dScore > 21) {
+    outcome = 'P';
+  } else if (pScore === dScore) {
+    outcome = 'T';
+  } else return;
+}
+
+function handleMessage(outcome) {
+  if (outcome === )
 }
 
 function updateWager(evt) {
@@ -170,61 +177,6 @@ function updateWager(evt) {
   } else if (purse === 0) {betEl.style.visibility = 'hidden'};
 }
 
-function checkForWinner() {
-  checkFor21();
-  if (turn === 'Dealer') {
-    if (pScore > dScore && pScore < 21) {
-      winner = true;
-      currentWagerEl.innerText = `You win $${currentWager}!`
-      purse += (currentWager * 2);
-      turn = 'Player';
-      currentWager = 0;
-    } else if (dScore > pScore && dScore < 21) {
-      winner = true;
-      currentWagerEl.innerText = "Dealer wins!"
-      turn = 'Player';
-      currentWager = 0;
-    } else if (pScore > 21) {
-      winner = true;
-      currentWagerEl.innerText = "You busted, dealer wins!"
-      turn = 'Player';
-      currentWager = 0;
-    } else if (dScore > 21) {
-      winner = true;
-      purse += (currentWager * 2);
-      currentWagerEl.innerText = `Dealer busted, you win $${currentWager}!`
-      turn = 'Player';
-      currentWager = 0;
-    } else if (dScore === pScore) {
-      winner = true;
-      purse += currentWager;
-      currentWagerEl.innerText = "Push!"
-      turn = 'Player';
-      currentWager = 0;
-    }
-  }
-  if (winner === false) return;
-  if (turn === 'Player' && pScore > 21) {
-    winner = true;
-    currentWagerEl.innerText = "You busted, dealer wins!";
-    currentWager = 0;
-  }
-  if (winner === true){
-    revealDealerCard();
-    // stayEl.style.visibility = 'hidden';
-    // hitEl.style.visibility = 'hidden';
-    hideButtons();
-    if (purse === 0) {
-      currentWagerEl.innerText = "You ran out of money. Game over!"
-      playEl.style.visibility = 'visible';
-      betEl.style.visibility = 'hidden';
-      dealEl.style.visibility = 'hidden';
-    }
-  }
-  dealEl.style.visibility = 'visible'
-  return purse;
-}
-
 function revealDealerCard() {
   const hiddenCardEl = document.getElementById('dealer-hidden-card');
   if (hiddenCardEl) {
@@ -233,9 +185,9 @@ function revealDealerCard() {
 }
 
 function dealHand() {
+  render();
   // Creating copy of original deck
   const tempDeck = [...originalDeck];
-  dealEl.style.visibility = 'hidden';
   // Deal player and dealer 2 random cards ensuring can't receive
   //  exact same cards
   while (dHand.length < 2) {
@@ -263,56 +215,42 @@ function dealHand() {
 function handlePlayerHit(evt) {
   checkFor21();
   if (pScore < 21) {
-    if (evt.target.id === 'hit') {
-      const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-      pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
-      let lastIndex = pHand.length - 1;
-      let newCard = pHand[lastIndex];
-      playerContainerEl.innerHTML += 
-        `<div class="card ${newCard.face}"></div>` ;
-      pScore = getHandTotal(pHand);
-      // Only show player score
-      pScoreEl.innerText = `Score: ${pScore}`;
-      if (pScore >= 21) {
-        hitEl.style.visibility = 'hidden';
-      }
-    }
+    const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+    pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+    let lastIndex = pHand.length - 1;
+    let newCard = pHand[lastIndex];
+    playerContainerEl.innerHTML += 
+      `<div class="card ${newCard.face}"></div>` ;
+    pScore = getHandTotal(pHand);
+    // Only show player score
+    pScoreEl.innerText = `Score: ${pScore}`;
   } 
   if (pScore > 21) {
     outcome = 'D';
     handleDealerHit();
+    settleBet();
   }
   checkFor21();
+  renderControls();
   return currentDeck;
 }
 
 // Dealer has to hit on anything <= 16 until total is >=17
 function handleDealerHit() {
   checkFor21();
-  turn = 'Dealer';
-  if (turn === 'Dealer' && pScore < 21) {
-    while (dScore <= 16 && dScore !== 21) {
-      const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-      dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
-      let lastIndex = dHand.length - 1;
-      let newCard = dHand[lastIndex];
-      dealerContainerEl.innerHTML += 
-      `<div class="card ${newCard.face}"></div>` ;
-      // Update dealer score
-      dScore = getHandTotal(dHand);
-      if (dScore > 21) {
-        dScoreEl.innerText = `Score: ${dScore}`
-        checkForWinner()
-        return;
-      }
-    }
+  while (dScore <= 16 && dScore !== 21) {
+    const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+    dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+    let lastIndex = dHand.length - 1;
+    let newCard = dHand[lastIndex];
+    dealerContainerEl.innerHTML += 
+    `<div class="card ${newCard.face}"></div>` ;
+    // Update dealer score
+    dScore = getHandTotal(dHand);
   }
   dScoreEl.innerText = `Score: ${dScore}`
-  checkForWinner();
-}
-
-function handleMisclick(evt) {
-  if (evt.target.class !== 'btn') return;
+  revealDealerCard();
+  checkforWinner();
 }
 
 function renderHand() {
@@ -350,6 +288,9 @@ function buildOriginalDeck() {
   return deck;
 }
 
+function handleMisclick(evt) {
+  if (evt.target.class !== 'btn') return;
+}
 
 // Have a spceific function that clears only parts of state and 
 //  not the others
