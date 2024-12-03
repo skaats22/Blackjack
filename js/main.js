@@ -48,7 +48,6 @@ const handOverEl = document.querySelectorAll('.hand-over');
 const msgEl = document.getElementById('message');
 
 /*--------------- event listeners --------------*/
-document.querySelector('section').addEventListener('click', handleMisclick);
 stayEl.addEventListener('click', handleDealerHit);
 playEl.addEventListener('click', init);
 hitEl.addEventListener('click', handlePlayerHit);
@@ -62,7 +61,7 @@ function init() {
   pScore = 0;
   dScore = 0;
   purse = 100;
-  currentWager = 0;
+  currentWager = 0
   dHand = [];
   pHand = [];
   render();
@@ -70,13 +69,24 @@ function init() {
 
 init();
 
-function renderBoard() {
+function renderBoard() {  
   purseEl.innerText = `Purse: $${purse}`;
   currentWagerEl.innerText = `Current Wager: $${currentWager}`;
+  pScoreEl.innerText = `Score: ${pScore}`;
+  dScoreEl.innerText = `Score:`;
+  outcome = null;
+  msgEl.innerText = MSG_LOOKUP[outcome];
   dealerContainerEl.innerHTML = '';
   playerContainerEl.innerHTML = '';
-  dScore = 0;
-  pScore = 0;
+}
+
+// 
+function handInPlay() {
+  if (outcome === null) {
+    return;
+  } else if (outcome !== null){
+    handleDealerHit();
+  }
 }
 
 function renderControls() {
@@ -91,10 +101,9 @@ function renderControls() {
 
 function render() {
   renderHand();
-  betEl.innerHTML = currentWager;
-  purseEl.innerHTML = purse;
+  currentWagerEl.innerHTML = `Current Wager: ${currentWager}`;
+  purseEl.innerText = `Purse: $${purse}`;
   renderControls();
-  msgEl.innerHTML = MSG_LOOKUP[outcome];
 }
 
 function settleBet() {
@@ -104,14 +113,6 @@ function settleBet() {
     purse += bet * 2;
   }
   currentWager = 0;
-}
-
-function checkFor21() {
-  if (pScore === 21) {
-    outcome = 'PBJ';
-  } else if (dScore === 21) {
-    outcome = 'DBJ';
-  }
 }
 
 // Credit Jim Clark
@@ -129,40 +130,32 @@ function getHandTotal(hand) {
   return total;
 }
 
-function render() {
-  purseEl.innerText = `Purse: $${purse}`;
-  currentWagerEl.innerText = `Current Wager: $${currentWager}`;
-  dealerContainerEl.innerHTML = '';
-  playerContainerEl.innerHTML = '';
-  dScore = 0;
-  pScore = 0;
-  dScoreEl.innerText = `Score:`;
-  pScoreEl.innerText = `Score:`;
-}
-
 // Check if dealer or player has 21 before continuing hand
 function checkFor21() {
   if (dScore === 21 && pScore === 21) {
     outcome = 'T';
+    return outcome;
   } else if (dScore === 21) {
     outcome = 'DBJ';
+    return outcome;
   } else if (pScore === 21) {
     outcome = 'PBJ';
+    return outcome;
   } else return;
 }
 
 function checkForWinner() {
-  if (pScore > 21) {
+  if (pScore > 21 || dScore > pScore) {
     outcome = 'D';
-  } else if (dScore > 21) {
+  } else if (dScore > 21 || pScore > dScore) {
     outcome = 'P';
   } else if (pScore === dScore) {
     outcome = 'T';
-  } else return;
+  } 
 }
 
 function handleMessage(outcome) {
-  if (outcome === )
+    msgEl.innerHTML = MSG_LOOKUP[outcome];
 }
 
 function updateWager(evt) {
@@ -185,7 +178,9 @@ function revealDealerCard() {
 }
 
 function dealHand() {
-  render();
+  dHand = [];
+  pHand = [];
+  renderBoard();
   // Creating copy of original deck
   const tempDeck = [...originalDeck];
   // Deal player and dealer 2 random cards ensuring can't receive
@@ -207,66 +202,65 @@ function dealHand() {
   playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>` ;
   playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>` ;
   currentDeck = tempDeck;
-  renderHand();
   checkFor21();
   return currentDeck;
 }
 
-function handlePlayerHit(evt) {
-  checkFor21();
-  if (pScore < 21) {
-    const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-    pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
-    let lastIndex = pHand.length - 1;
-    let newCard = pHand[lastIndex];
-    playerContainerEl.innerHTML += 
-      `<div class="card ${newCard.face}"></div>` ;
-    pScore = getHandTotal(pHand);
-    // Only show player score
-    pScoreEl.innerText = `Score: ${pScore}`;
-  } 
+function handlePlayerHit() {
+  const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+  pHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+  let lastIndex = pHand.length - 1;
+  let newCard = pHand[lastIndex];
+  console.log(pScore);
+  playerContainerEl.innerHTML += 
+  `<div class="card ${newCard.face}"></div>` ;
+  pScore = getHandTotal(pHand);
+  // Only show player score
+  pScoreEl.innerText = `Score: ${pScore}`;
+  
   if (pScore > 21) {
-    outcome = 'D';
+    outcome = 'D'
     handleDealerHit();
-    settleBet();
   }
   checkFor21();
   renderControls();
-  return currentDeck;
+  return pHand;
 }
 
 // Dealer has to hit on anything <= 16 until total is >=17
 function handleDealerHit() {
-  checkFor21();
-  while (dScore <= 16 && dScore !== 21) {
-    const pRndIdx = Math.floor(Math.random() * currentDeck.length);
-    dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
-    let lastIndex = dHand.length - 1;
-    let newCard = dHand[lastIndex];
-    dealerContainerEl.innerHTML += 
-    `<div class="card ${newCard.face}"></div>` ;
-    // Update dealer score
-    dScore = getHandTotal(dHand);
+  if (pScore < 21) {
+    while (dScore <= 16 && dScore !== 21) {
+      const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+      dHand.push(currentDeck.splice(pRndIdx, 1) [0]);
+      let lastIndex = dHand.length - 1;
+      let newCard = dHand[lastIndex];
+      dealerContainerEl.innerHTML += 
+      `<div class="card ${newCard.face}"></div>` ;
+      dScore = getHandTotal(dHand);
+    }
   }
+  // Update dealer score
   dScoreEl.innerText = `Score: ${dScore}`
   revealDealerCard();
-  checkforWinner();
+  checkFor21();
+  checkForWinner();
+  handleMessage(outcome);
 }
 
 function renderHand() {
-  // Update player and dealer score
-  pScore = getHandTotal(pHand);
-  dScore = getHandTotal(dHand);
-  pScoreEl.innerText = `Score: ${pScore}`;
   // Show dealer score for testing
   // Render initial cards on the table (except first dealer card)
-  dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
-  for (let i = 1; i < dHand.length; i++) {
+  // dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
+  for (let i = 0; i < dHand.length; i++) {
     dealerContainerEl.innerHTML += `<div class="card ${dHand[i].face}"></div>` ;
   }
   pHand.forEach(function(element) {
     playerContainerEl.innerHTML += `<div class="card ${pHand[element].face}"></div>` ;
   });
+  // Update player and dealer score
+  pScore = getHandTotal(pHand);
+  dScore = getHandTotal(dHand);
   checkFor21();
 }
 
@@ -287,21 +281,6 @@ function buildOriginalDeck() {
   });
   return deck;
 }
-
-function handleMisclick(evt) {
-  if (evt.target.class !== 'btn') return;
-}
-
-// Have a spceific function that clears only parts of state and 
-//  not the others
-// Have a full reset function that clears all state
-
-// For ace, build in logic only if hit
-
-
-// If a state is true 
-// Maybe there's a helper function that you can create to check something
-// and trigger something, so don't have to repeat same line of code
 
 // Current issues needing to be resolved:
 // 1. Need to hit deal to reset, then bet to keep going
