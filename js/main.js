@@ -14,7 +14,6 @@ const MSG_LOOKUP = {
 
 // Build an 'original' deck of 'card' objects used to create shuffled decks
 const originalDeck = buildOriginalDeck();
-//renderDeckInContainer(originalDeck, document.querySelector('.dealer-cards'));
 
 /*--------------- state variables ---------------*/
 let pScore, dScore; // Player/dealer score
@@ -39,17 +38,10 @@ const stayEl = document.querySelector('#stay');
 const hitEl = document.querySelector('#hit');
 const betEl = document.querySelector('#bet');
 const playEl = document.querySelector('#play');
-const initBet = document.getElementsByClassName('continue');
-const allBtnEl = document.querySelectorAll('.btn');
 const dealEl = document.querySelector('#deal');
-/////////////////
-const handActiveEl = document.querySelectorAll('.hand-active');
-const handOverEl = document.querySelectorAll('.hand-over');
-
-const handOffEl = document.querySelectorAll('.hand-off');
-const handOnEl = document.querySelectorAll('.hand-on');
-
+// Message elements
 const msgEl = document.getElementById('message');
+const initBetEl = document.querySelector('.continue');
 
 /*--------------- event listeners --------------*/
 stayEl.addEventListener('click', handleDealerHit);
@@ -87,31 +79,37 @@ function renderBoard() {
   pScoreEl.innerText = `Score: ${pScore}`;
   dScoreEl.innerText = `Score:`;
   msgEl.innerText = MSG_LOOKUP[outcome];
-  // dealerContainerEl.innerHTML = '';
+  dealerContainerEl.innerHTML = '';
   playerContainerEl.innerHTML = '';
 }
 
-// If the pHand array has any length and there's an 
+// If the pHand array has any length and outcome != null, then hand in play
 function handInPlay() {
   return pHand.length && !outcome;
 }
 
 // Decide which button shows at what time
 function renderControls() {
+  currentWagerEl.innerText = `Current Wager: $${currentWager}`;
+  purseEl.innerText = `Purse: $${purse}`;
   // If current wager is >= 10 and the hand is not in play, 
   //  the button will be visible, otherwise hidden
   dealEl.style.visibility = currentWager >= 10 && !handInPlay() ? 'visible' : 'hidden';
-  // playEl.style.visibility = purse < 10 && outcome === 'D'  ? 'visible' : 'hidden';
+  initBetEl.style.visibility = currentWager < 10 && !handInPlay() ? 'visible' : 'hidden';
+  betEl.style.visibility = purse === 0 || handInPlay() ? 'hidden' : 'visible';
   if (purse < 10) {
-    if (outcome === 'D' || outcome === 'DBJ')
+    if (outcome === 'D' || outcome === 'DBJ') {
       playEl.style.visibility = 'visible';
+      initBetEl.innerText = "Game Over. Reset to continue."
+    }
+  } else {
+    playEl.style.visibility = 'hidden'
+    initBetEl.innerText = "Place a bet to continue."
   }
-  // msgEl.innerText = currentWager < 10 && !handInPlay() ? 'Bet to begin.' : 'Good Luck!';
-  // If hand is in play, then hide deal button, otherwise show it
-  // dealEl.style.visibility = handInPlay() ? 'hidden' : 'visible';
-  // If the hand is in play, then show handActive buttons
+  // If the hand is in play, then show hit & stay buttons
   hitEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
   stayEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
+  showMsg();
 }
 
 function render() {
@@ -119,8 +117,8 @@ function render() {
   purseEl.innerText = `Purse: $${purse}`;
   msgEl.innerHTML = MSG_LOOKUP[outcome];
   renderBoard();
-  renderHand();
   renderControls();
+  renderHand();
 }
 
 // Credit Jim Clark
@@ -172,14 +170,15 @@ function checkForWinner() {
 }
 
 function updateWager() {
+  dealInit();
   if (purse >= 10) {
     currentWager += 10;
     purse -= 10;
   }
-  if (purse < 10) { betEl.style.visibility = 'hidden' };
   currentWagerEl.innerText = `Current Wager: $${currentWager}`;
   purseEl.innerText = `Purse: $${purse}`;
-  render();
+  renderControls()
+  renderBoard();
 }
 
 function settleBet() {
@@ -228,6 +227,7 @@ function dealHand() {
 }
 
 function handlePlayerHit() {
+  // Add random index of current deck to player hand
   const pRndIdx = Math.floor(Math.random() * currentDeck.length);
   pHand.push(currentDeck.splice(pRndIdx, 1)[0]);
   let lastIndex = pHand.length - 1;
@@ -298,11 +298,3 @@ function buildOriginalDeck() {
   });
   return deck;
 }
-
-// Current issues needing to be resolved:
-// 1. Need to hit deal to reset, then bet to keep going
-// 3. Lots of button hiding and visibility
-// 4. Don't really have a 'state' - everything is mostly hard-coded
-// 5. Purse can go below 0 if I have a 5 from a blackjack win
-
-// Update deal hand for multiple games and compete wager logic
