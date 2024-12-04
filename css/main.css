@@ -3,6 +3,10 @@
   border-radius: 20px;
 }
 
+h1, h2 {
+
+}
+
 section {
   padding: 10px;
 }
@@ -29,9 +33,10 @@ h3 {
   box-sizing: border-box;
   border: 10px solid black;
   justify-content: center;
-  height: 1100px;
+  height: 1300px;
   width: 1200px;
   background-color: lightpink;
+  
 }
 
 .dealer-cards, .player-cards {
@@ -42,7 +47,7 @@ h3 {
   padding: 30px;
   margin: 20px;
   background-color: green;
-  height: 200px;
+  height: 300px;
 }
 
 #wager {
