@@ -20,6 +20,11 @@ h3 {
 
 }
 
+.continue {
+  text-align: center;
+  color: purple;
+}
+
 #table {
   box-sizing: border-box;
   border: 10px solid black;

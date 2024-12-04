@@ -39,6 +39,7 @@ const stayEl = document.querySelector('#stay');
 const hitEl = document.querySelector('#hit');
 const betEl = document.querySelector('#bet');
 const playEl = document.querySelector('#play');
+const initBet = document.getElementsByClassName('continue');
 const allBtnEl = document.querySelectorAll('.btn');
 const dealEl = document.querySelector('#deal');
 /////////////////
@@ -70,6 +71,14 @@ function init() {
   render();
 }
 
+function dealInit() {
+  outcome = null;
+  pScore = 0;
+  dScore = 0;
+  dHand = [];
+  pHand = [];
+}
+
 init();
 
 function renderBoard() {
@@ -78,33 +87,39 @@ function renderBoard() {
   pScoreEl.innerText = `Score: ${pScore}`;
   dScoreEl.innerText = `Score:`;
   msgEl.innerText = MSG_LOOKUP[outcome];
-  dealerContainerEl.innerHTML = '';
+  // dealerContainerEl.innerHTML = '';
   playerContainerEl.innerHTML = '';
 }
 
 // If the pHand array has any length and there's an 
 function handInPlay() {
-  return pHand.length && outcome;
+  return pHand.length && !outcome;
 }
 
 // Decide which button shows at what time
 function renderControls() {
   // If current wager is >= 10 and the hand is not in play, 
   //  the button will be visible, otherwise hidden
-  dealEl.style.visibility = currentWager >= 10 && handInPlay() ? 'hidden' : 'visible';
+  dealEl.style.visibility = currentWager >= 10 && !handInPlay() ? 'visible' : 'hidden';
+  // playEl.style.visibility = purse < 10 && outcome === 'D'  ? 'visible' : 'hidden';
+  if (purse < 10) {
+    if (outcome === 'D' || outcome === 'DBJ')
+      playEl.style.visibility = 'visible';
+  }
+  // msgEl.innerText = currentWager < 10 && !handInPlay() ? 'Bet to begin.' : 'Good Luck!';
   // If hand is in play, then hide deal button, otherwise show it
   // dealEl.style.visibility = handInPlay() ? 'hidden' : 'visible';
   // If the hand is in play, then show handActive buttons
-  hitEl.style.visibility = handInPlay() ? 'hidden' : 'visible';
-  stayEl.style.visibility = handInPlay() ? 'hidden' : 'visible';
+  hitEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
+  stayEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
 }
 
 function render() {
   currentWagerEl.innerHTML = `Current Wager: ${currentWager}`;
   purseEl.innerText = `Purse: $${purse}`;
   msgEl.innerHTML = MSG_LOOKUP[outcome];
-  renderHand();
   renderBoard();
+  renderHand();
   renderControls();
 }
 
@@ -130,13 +145,17 @@ function checkFor21() {
     revealDealerCard();
   } else if (dScore === 21) {
     outcome = 'DBJ';
-    msgEl.innerText = MSG_LOOKUP[outcome];
     revealDealerCard();
   } else if (pScore === 21) {
     outcome = 'PBJ';
-    msgEl.innerText = MSG_LOOKUP[outcome];
     revealDealerCard();
   }
+  showMsg();
+  renderControls();
+}
+
+function showMsg() {
+  msgEl.innerText = MSG_LOOKUP[outcome];
 }
 
 function checkForWinner() {
@@ -147,6 +166,8 @@ function checkForWinner() {
   } else if (pScore === dScore) {
     outcome = 'T';
   }
+  revealDealerCard();
+  showMsg();
   settleBet();
 }
 
@@ -158,6 +179,7 @@ function updateWager() {
   if (purse < 10) { betEl.style.visibility = 'hidden' };
   currentWagerEl.innerText = `Current Wager: $${currentWager}`;
   purseEl.innerText = `Purse: $${purse}`;
+  render();
 }
 
 function settleBet() {
@@ -165,8 +187,9 @@ function settleBet() {
     purse += currentWager + (currentWager * 1.5);
   } else if (outcome === 'P') {
     purse += currentWager * 2;
-  }
+  } else if (outcome === 'T') purse += currentWager;
   currentWager = 0;
+  renderControls();
 }
 
 function revealDealerCard() {
@@ -177,8 +200,7 @@ function revealDealerCard() {
 }
 
 function dealHand() {
-  dHand = [];
-  pHand = [];
+  dealInit();  
   // Creating copy of original deck
   const tempDeck = [...originalDeck];
   // Deal player and dealer 2 random cards ensuring can't receive
@@ -193,11 +215,6 @@ function dealHand() {
   pScore = getHandTotal(pHand);
   dScore = getHandTotal(dHand);
   pScoreEl.innerText = `Score: ${pScore}`;
-  // Render initial cards on the table (except first dealer card)
-  dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
-  dealerContainerEl.innerHTML += `<div class="card ${dHand[1].face}"></div>`;
-  playerContainerEl.innerHTML += `<div class="card ${pHand[0].face}"></div>`;
-  playerContainerEl.innerHTML += `<div class="card ${pHand[1].face}"></div>`;
   if (dScore === 21 && pScore === 21) {
     outcome = 'T';
   } else if (dScore === 21) {
@@ -208,7 +225,6 @@ function dealHand() {
   if (outcome) settleBet();
   currentDeck = tempDeck;
   render();
-  return currentDeck;
 }
 
 function handlePlayerHit() {
@@ -226,7 +242,6 @@ function handlePlayerHit() {
     settleBet();
   }
   checkFor21();
-  return pHand;
 }
 
 // Dealer has to hit on anything <= 16 until total is >=17
@@ -247,19 +262,18 @@ function handleDealerHit() {
   if (dScore > 21) {
     outcome = 'P';
   }
-  revealDealerCard();
   checkFor21();
   checkForWinner();
 }
 
 function renderHand() {
   // Render initial cards on the table (except first dealer card)
-  for (let i = 1; i < dHand.length - 1; i++) {
+  for (let i = 0; i < dHand.length; i++) {
+    dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
     dealerContainerEl.innerHTML += `<div class="card ${dHand[i].face}"></div>`;
   }
-  pHand.forEach(function (element) {
-    console.log(element);
-    playerContainerEl.innerHTML += `<div class="card ${pHand[element].face}"></div>`;
+  pHand.forEach(function (element, idx) {
+    playerContainerEl.innerHTML += `<div class="card ${pHand[idx].face}"></div>`;
   });
   // Update player and dealer score
   pScore = getHandTotal(pHand);
@@ -290,3 +304,5 @@ function buildOriginalDeck() {
 // 3. Lots of button hiding and visibility
 // 4. Don't really have a 'state' - everything is mostly hard-coded
 // 5. Purse can go below 0 if I have a 5 from a blackjack win
+
+// Update deal hand for multiple games and compete wager logic
