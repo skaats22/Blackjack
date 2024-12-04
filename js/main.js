@@ -50,6 +50,20 @@ hitEl.addEventListener('click', handlePlayerHit);
 betEl.addEventListener('click', updateWager);
 dealEl.addEventListener('click', dealHand);
 
+// Sound credit: https://freesound.org/people/AKkingStudio/sounds/684165/
+betEl.addEventListener('click', (evt) => {
+  betSays.volume = .05;
+  betSays.play();
+});
+const betSays = new Audio('../assets/audio/coin-ca-ching.mp3');
+
+// Sound credit: https://freesound.org/people/CaptainYulef/sounds/638698/
+dealEl.addEventListener('click', (evt) => {
+  dealSays.volume = .05;
+  dealSays.play();
+});
+const dealSays = new Audio('../assets/audio/card-shuffle.wav');
+
 /*--------------- functions ---------------*/
 
 function init() {
