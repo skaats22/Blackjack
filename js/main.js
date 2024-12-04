@@ -104,7 +104,7 @@ function renderControls() {
     }
   } else {
     playEl.style.visibility = 'hidden'
-    initBetEl.innerText = "Place a bet to continue."
+    initBetEl.innerText = "Place a bet to begin."
   }
   // If the hand is in play, then show hit & stay buttons
   hitEl.style.visibility = handInPlay() ? 'visible' : 'hidden';

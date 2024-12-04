@@ -1,23 +1,27 @@
 * {
   box-sizing: border-box;
-  border-radius: 20px;
 }
 
 section {
   padding: 10px;
+  border-radius: 20px;
+}
+
+h1 {
+  text-align: center;
 }
 
 h3 {
-  margin: 10px 10px;
-  font-size: 28px;
+  margin: 5px;
+  font-size: 20px;
 }
 
 #message {
-  font-size: 44px;
+  font-size: 30px;
   text-align: center;
-  margin: 10px;
+  flex-grow: .5;
+  margin: 10px 5px;
   text-decoration: underline;
-
 }
 
 .continue {
@@ -25,52 +29,86 @@ h3 {
   color: purple;
 }
 
+#dealer, #player {
+  min-width: 150px;
+}
+
 #table {
   box-sizing: border-box;
   border: 10px solid black;
   justify-content: center;
-  height: 1300px;
+  height: 750px;
   width: 1200px;
   background-color: lightpink;
-  
+  margin: 0 auto;
 }
 
 .dealer-cards, .player-cards {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  align-items: center;
   border: 5px solid grey;
-  padding: 30px;
-  margin: 20px;
+  padding: 15px;
+  margin: 25px 100px 10px 50px;
   background-color: green;
-  height: 300px;
+  height: 200px;
+  width: 90%;
+  border-radius: 20px;
 }
 
 #wager {
   text-align: center;
   border: 5px solid red;
   margin: 10px 300px;
+  border-radius: 20px;
 }
 
 #hit, #stay {
   display: flex-row;
+  border-radius: 20px;
+  margin: 5px 10px;
+}
+
+#deal, #play {
+  margin: 5px 5px;
+}
+
+#bet {
+  margin: 5px 0px 5px 5px;
+}
+
+.hand-on {
+  display: flex;
+  justify-content: center;
+}
+
+.hand-off {
+  display: flex;
+}
+
+.dealer-all, .player-all {
+  display: flex;
 }
 
 button {
   cursor: pointer;
-  padding: 15px 30px;
-  font-size: 25px;
+  padding: 15px 20px;
+  font-size: 20px;
+  border-radius: 20px;
 }
 
 /* Credit: Riplit */
-.card-back {
+.card-back, .card {
   box-sizing: border-box;
   display: inline-block;
   margin: 5px 5px 50px 5px;
   cursor: pointer;
   font-size: inherit;
-  width: 4.0em;
-  height: 5.5em;
+  width: 6.0em;
+  height: 7.5em;
   background-color: #fff;
   border-radius: 0.20em;
   border: 1px solid #c3c3c3;
