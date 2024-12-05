@@ -6,9 +6,9 @@
 ### See if you have what it takes to beat the dealer in this exciting game of Blackjack!
 
 ## Beginning of a game
-![Screenshots of Blackjack game](https://i.imgur.com/1BTl1Xx.png)
+![Screenshots of Blackjack game](https://i.imgur.com/8YZDBF9.png)
 ## Middle of a hand
-![Screenshots of Blackjack game](https://i.imgur.com/8GNZmsr.png)
+![Screenshots of Blackjack game](https://i.imgur.com/P0zmdEc.jpeg)
 
 
 ## Technologies Used

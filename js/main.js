@@ -265,6 +265,7 @@ function revealDealerCard() {
   const hiddenCardEl = document.getElementById('dealer-hidden-card');
   if (hiddenCardEl) {
     hiddenCardEl.outerHTML = `<div class="card ${dHand[0].face}"></div>`;
+    dScoreEl.innerText = `Score: ${dScore}`;
   }
 }
 
