@@ -64,6 +64,12 @@ dealEl.addEventListener('click', (evt) => {
 });
 const dealSays = new Audio('../assets/audio/card-shuffle.wav');
 
+// Sound credit: https://freesound.org/people/CaptainYulef/sounds/638698/
+hitEl.addEventListener('click', (evt) => {
+  hitSays.volume = .05;
+  hitSays.play();
+});
+const hitSays = new Audio('../assets/audio/card-shuffle.wav');
 /*--------------- functions ---------------*/
 
 function init() {
@@ -121,9 +127,18 @@ function renderControls() {
     initBetEl.innerText = "Place a bet to begin."
   }
   // If the hand is in play, then show hit & stay buttons
-  hitEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
-  stayEl.style.visibility = handInPlay() ? 'visible' : 'hidden';
-  showMsg();
+  if (handInPlay() === true) {
+    setTimeout(() => {
+      hitEl.style.visibility = 'visible';
+      stayEl.style.visibility = 'visible';
+    }, 1700)
+  } else if (handInPlay() === false || currentWager === 0) {
+    hitEl.style.visibility = 'hidden';
+    stayEl.style.visibility = 'hidden';
+  }
+  setTimeout(() => {
+    showMsg();
+  }, 300);
 }
 
 function render() {
@@ -154,15 +169,26 @@ function getHandTotal(hand) {
 function checkFor21() {
   if (dScore === 21 && pScore === 21) {
     outcome = 'T';
-    revealDealerCard();
+    setTimeout(() => {
+      win21();
+    }, 2000);
   } else if (dScore === 21) {
     outcome = 'DBJ';
-    revealDealerCard();
+    setTimeout(() => {
+      win21();
+    }, 2000);
   } else if (pScore === 21) {
     outcome = 'PBJ';
-    revealDealerCard();
+    setTimeout(() => {
+      win21();
+    }, 2000);
   }
+}
+
+function win21() {
+  revealDealerCard();
   showMsg();
+  winLossSound();
   renderControls();
 }
 
@@ -171,6 +197,9 @@ function showMsg() {
 }
 
 function checkForWinner() {
+  if (pScore === 21 || dScore === 21) {
+    return;
+  }
   if (dScore < 21 && dScore > pScore) {
     outcome = 'D';
   } else if (pScore < 21 && pScore > dScore) {
@@ -178,9 +207,12 @@ function checkForWinner() {
   } else if (pScore === dScore) {
     outcome = 'T';
   }
-  revealDealerCard();
-  showMsg();
-  settleBet();
+  setTimeout(() => {
+    revealDealerCard();
+    winLossSound();
+    showMsg();
+    settleBet();
+  }, 500)
 }
 
 function updateWager() {
@@ -203,6 +235,30 @@ function settleBet() {
   } else if (outcome === 'T') purse += currentWager;
   currentWager = 0;
   renderControls();
+}
+
+
+function winLossSound() {
+  // Sound credit: https://freesound.org/people/jbeetle/sounds/274510/
+  if (outcome === 'P' || outcome === 'PBJ') {
+    const winSays = new Audio('../assets/audio/cheering.wav');
+    winSays.play();
+    winSays.volume = .2;
+    // Sound credit: https://freesound.org/people/Robinhood76/sounds/687017/
+  } else if (outcome === 'D' || outcome === 'DBJ') {
+    const loseSays = new Audio('../assets/audio/boo.wav');
+    loseSays.play();
+    loseSays.volume = .2;
+    // Sound credit: https://freesound.org/people/Mikes-MultiMedia/sounds/418509/
+  } else if (outcome === 'T') {
+    const tieSays = new Audio('../assets/audio/duck.wav');
+    tieSays.play();
+    tieSays.volume = .75;
+    setTimeout(() => {
+      tieSays.play();
+      tieSays.volume = .75;
+    }, 875);
+  }
 }
 
 function revealDealerCard() {
@@ -228,14 +284,7 @@ function dealHand() {
   pScore = getHandTotal(pHand);
   dScore = getHandTotal(dHand);
   pScoreEl.innerText = `Score: ${pScore}`;
-  if (dScore === 21 && pScore === 21) {
-    outcome = 'T';
-  } else if (dScore === 21) {
-    outcome = 'DBJ';
-  } else if (pScore === 21) {
-    outcome = 'PBJ';
-  }
-  if (outcome) settleBet();
+  checkFor21();
   currentDeck = tempDeck;
   render();
 }
@@ -246,14 +295,16 @@ function handlePlayerHit() {
   pHand.push(currentDeck.splice(pRndIdx, 1)[0]);
   let lastIndex = pHand.length - 1;
   let newCard = pHand[lastIndex];
-  playerContainerEl.innerHTML +=
-    `<div class="card ${newCard.face}"></div>`;
+  setTimeout(() => {
+    playerContainerEl.innerHTML +=
+      `<div class="card ${newCard.face}"></div>`;
+    // Only show player score
+    pScoreEl.innerText = `Score: ${pScore}`;
+  }, 500);
   pScore = getHandTotal(pHand);
-  // Only show player score
-  pScoreEl.innerText = `Score: ${pScore}`;
   if (pScore > 21) {
     outcome = 'D';
-    settleBet();
+    checkForWinner();
   }
   checkFor21();
 }
@@ -266,18 +317,23 @@ function handleDealerHit() {
       dHand.push(currentDeck.splice(pRndIdx, 1)[0]);
       let lastIndex = dHand.length - 1;
       let newCard = dHand[lastIndex];
-      dealerContainerEl.innerHTML +=
-        `<div class="card ${newCard.face}"></div>`;
+      setTimeout(() => {
+        dealerContainerEl.innerHTML +=
+          `<div class="card ${newCard.face}"></div>`;
+      }, 500);
       dScore = getHandTotal(dHand);
     }
   }
   // Update dealer score
-  dScoreEl.innerText = `Score: ${dScore}`;
   if (dScore > 21) {
     outcome = 'P';
   }
-  checkFor21();
-  checkForWinner();
+  setTimeout(() => {
+    dScoreEl.innerText = `Score: ${dScore}`;
+    revealDealerCard();
+    checkForWinner();
+    checkFor21();
+  }, 750);
 }
 
 function renderHand() {
@@ -285,7 +341,7 @@ function renderHand() {
   pHand.forEach(function (element, idx) {
     setTimeout(() => {
       playerContainerEl.innerHTML += `<div class="card ${pHand[idx].face}"></div>`;
-    }, idx * 500); // 1 second delay between player cards
+    }, idx * 500); // 500ms delay between player cards
   });
   setTimeout(() => {
     for (let i = 0; i < dHand.length; i++) {
@@ -302,7 +358,6 @@ function renderHand() {
   setTimeout(() => {
     pScore = getHandTotal(pHand);
     dScore = getHandTotal(dHand);
-    checkFor21();
   }, (pHand.length + dHand.length) * 1000);
 }
 
