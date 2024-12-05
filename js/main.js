@@ -65,6 +65,13 @@ dealEl.addEventListener('click', (evt) => {
 const dealSays = new Audio('../assets/audio/card-shuffle.wav');
 
 // Sound credit: https://freesound.org/people/CaptainYulef/sounds/638698/
+stayEl.addEventListener('click', (evt) => {
+  staySays.volume = .05;
+  staySays.play();
+});
+const staySays = new Audio('../assets/audio/card-shuffle.wav');
+
+// Sound credit: https://freesound.org/people/CaptainYulef/sounds/638698/
 hitEl.addEventListener('click', (evt) => {
   hitSays.volume = .05;
   hitSays.play();
@@ -171,17 +178,17 @@ function checkFor21() {
     outcome = 'T';
     setTimeout(() => {
       win21();
-    }, 2000);
+    }, 1000);
   } else if (dScore === 21) {
     outcome = 'DBJ';
     setTimeout(() => {
       win21();
-    }, 2000);
+    }, 1000);
   } else if (pScore === 21) {
     outcome = 'PBJ';
     setTimeout(() => {
       win21();
-    }, 2000);
+    }, 1000);
   }
 }
 
