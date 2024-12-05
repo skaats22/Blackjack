@@ -134,7 +134,7 @@ function renderControls() {
     initBetEl.innerText = "Place a bet to begin."
   }
   // If the hand is in play, then show hit & stay buttons
-  if (handInPlay() === true) {
+  if (handInPlay() === true && dScore !== 21 && pScore !== 21) {
     setTimeout(() => {
       hitEl.style.visibility = 'visible';
       stayEl.style.visibility = 'visible';
@@ -178,17 +178,17 @@ function checkFor21() {
     outcome = 'T';
     setTimeout(() => {
       win21();
-    }, 1000);
+    }, 1500);
   } else if (dScore === 21) {
     outcome = 'DBJ';
     setTimeout(() => {
       win21();
-    }, 1000);
+    }, 1500);
   } else if (pScore === 21) {
     outcome = 'PBJ';
     setTimeout(() => {
       win21();
-    }, 1000);
+    }, 1500);
   }
 }
 
@@ -197,6 +197,7 @@ function win21() {
   showMsg();
   winLossSound();
   renderControls();
+  settleBet();
 }
 
 function showMsg() {
@@ -237,13 +238,16 @@ function updateWager() {
 function settleBet() {
   if (outcome === 'PBJ') {
     purse += currentWager + (currentWager * 1.5);
+    currentWager = 0;
+    renderControls();
   } else if (outcome === 'P') {
     purse += currentWager * 2;
+    currentWager = 0;
+    renderControls();
   } else if (outcome === 'T') purse += currentWager;
   currentWager = 0;
   renderControls();
 }
-
 
 function winLossSound() {
   // Sound credit: https://freesound.org/people/jbeetle/sounds/274510/
@@ -292,9 +296,9 @@ function dealHand() {
   pScore = getHandTotal(pHand);
   dScore = getHandTotal(dHand);
   pScoreEl.innerText = `Score: ${pScore}`;
-  checkFor21();
   currentDeck = tempDeck;
   render();
+  checkFor21();
 }
 
 function handlePlayerHit() {
@@ -332,7 +336,6 @@ function handleDealerHit() {
       dScore = getHandTotal(dHand);
     }
   }
-  // Update dealer score
   if (dScore > 21) {
     outcome = 'P';
   }
@@ -362,6 +365,7 @@ function renderHand() {
       }, i * 500);
     }
   }, pHand.length * 500);
+
   // Update player and dealer score after cards dealt
   setTimeout(() => {
     pScore = getHandTotal(pHand);
