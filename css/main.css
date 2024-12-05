@@ -1,62 +1,135 @@
 * {
   box-sizing: border-box;
-  border-radius: 20px;
+}
+
+body {
+  /* Image credit: https://unsplash.com/photos/a-lot-of-different-colored-casino-chips-5to5BOIwLPw */
+  background-image: url("https://images.unsplash.com/photo-1719228159189-148c8c45e634?q=80&w=3812&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  font-family: 'PT', sans-serif;
 }
 
 section {
   padding: 10px;
+  border-radius: 20px;
+}
+
+h1 {
+  text-align: center;
+  background: #b3afaf;
+  font-size: 45px;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  border-radius: 5px;
+  border: 5px solid black;
+  border-bottom: none;
+  position: relative;
+  min-width: 530px;
+  max-width: 530px;
 }
 
 h3 {
-  margin: 10px 10px;
+  margin: 5px;
+  font-size: 20px;
+}
+
+#message {
+  font-size: 30px;
+  text-align: center;
+  flex-grow: .5;
+  margin: 10px 5px;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+.continue {
+  text-align: center;
+  color: rebeccapurple;
+}
+
+#dealer, #player {
+  min-width: 150px;
 }
 
 #table {
   box-sizing: border-box;
   border: 10px solid black;
   justify-content: center;
-  height: 1100px;
+  height: 750px;
   width: 1200px;
   background-color: lightpink;
+  margin: 0 auto;
 }
 
 .dealer-cards, .player-cards {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  align-items: center;
   border: 5px solid grey;
-  padding: 30px;
-  margin: 20px;
+  padding: 15px;
+  margin: 25px 100px 10px 50px;
   background-color: green;
   height: 200px;
-
+  width: 90%;
+  border-radius: 20px;
 }
 
 #wager {
   text-align: center;
   border: 5px solid red;
   margin: 10px 300px;
+  border-radius: 20px;
 }
 
 #hit, #stay {
+  display: flex-row;
+  border-radius: 20px;
+  margin: 5px 10px;
+  justify-content: center;
+  min-width: 80px;
+}
+
+#deal, #play {
+  margin: 5px 5px;
+}
+
+#bet {
+  margin: 5px 0px 5px 5px;
+}
+
+.hand-on {
+  display: flex;
+  justify-content: center;
+  margin: 0px 0px 0px 125px;
+}
+
+.hand-off {
+  display: flex;
+}
+
+.dealer-all, .player-all {
   display: flex;
 }
 
 button {
   cursor: pointer;
-  padding: 15px 30px;
-  font-size: 25px;
+  padding: 15px 20px;
+  font-size: 20px;
+  border-radius: 20px;
 }
 
 /* Credit: Riplit */
-.card-back {
+.card-back, .card {
   box-sizing: border-box;
   display: inline-block;
   margin: 5px 5px 50px 5px;
   cursor: pointer;
   font-size: inherit;
-  width: 4.0em;
-  height: 5.5em;
+  width: 6.0em;
+  height: 8em;
   background-color: #fff;
   border-radius: 0.20em;
   border: 1px solid #c3c3c3;

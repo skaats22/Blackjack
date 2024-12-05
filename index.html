@@ -3,31 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>CSS Card Library</title>
+    <title>Blackjack</title>
     <link href="css/card-library/css/cardstarter.css" rel="stylesheet" type="text/css" />
-    <link href="css/main.css" rel="stylesheet" type="text/css" />
+    <link href="css/main.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@100;400&display=swap" rel="stylesheet">
     <script defer src="js/main.js"></script>
   </head>
-  <body>
-  <h1>&#9824 Blackjack</h1>
-  <h2>$10 minimum</h2>
-  <section id="table">
-    <button id="play" class="btn">Play!</button>
-    <button id="deal" class="btn">Deal</button>
-    <button id="bet" class="btn">Bet $10</button>
+
+<body>
+  <h1>&#9824 Blackjack - $10 min</h1>
+<section id="table">
+
+  <div class="hand-off">
+    <button id="play" class="hand-over">Reset</button>
+    <button id="deal" class="hand-over">Deal</button>
+    <button id="bet" class="hand-over">Bet $10</button>
+    <h3 id="message">Good Luck!</h3>
+  </div>
+
+  <h3 class="continue">Place a bet to begin.</h3>
+
+  <div class="dealer-all">
     <h3 id="dealer"><u>Dealer</u>
-    <ul id="dealer-score">Score: </ul>
+      <ul id="dealer-score">Score: </ul>
     </h3>
     <div class="dealer-cards"></div>
-    <h3 id="wager">Current Wager: $</h3>
+  </div>
+
+  <h3 id="wager">Current Wager: $</h3>
+
+  <div class="player-all">
     <h3 id="player"><u>Player</u>
       <ul id="player-score">Score: </ul>
       <ul id="purse">Purse: $</ul>
     </h3>
     <div class="player-cards"></div>
-    <!-- <button id="bet-all">All in!</button> -->
-    <button id="hit" class="btn">Hit</button>
-    <button id="stay" class="btn">Stay</button>
-  </section>
+  </div>
+
+  <div class="hand-on">
+    <button id="hit" class="hand-active">Hit</button>
+    <button id="stay" class="hand-active">Stay</button>
+  </div>
+</section>
 </body>
 </html>
