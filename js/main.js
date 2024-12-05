@@ -213,7 +213,7 @@ function revealDealerCard() {
 }
 
 function dealHand() {
-  dealInit();  
+  dealInit();
   // Creating copy of original deck
   const tempDeck = [...originalDeck];
   // Deal player and dealer 2 random cards ensuring can't receive
@@ -282,17 +282,28 @@ function handleDealerHit() {
 
 function renderHand() {
   // Render initial cards on the table (except first dealer card)
-  for (let i = 0; i < dHand.length; i++) {
-    dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
-    dealerContainerEl.innerHTML += `<div class="card ${dHand[i].face}"></div>`;
-  }
   pHand.forEach(function (element, idx) {
-    playerContainerEl.innerHTML += `<div class="card ${pHand[idx].face}"></div>`;
+    setTimeout(() => {
+      playerContainerEl.innerHTML += `<div class="card ${pHand[idx].face}"></div>`;
+    }, idx * 500); // 1 second delay between player cards
   });
-  // Update player and dealer score
-  pScore = getHandTotal(pHand);
-  dScore = getHandTotal(dHand);
-  checkFor21();
+  setTimeout(() => {
+    for (let i = 0; i < dHand.length; i++) {
+      setTimeout(() => {
+        if (i === 0) {
+          dealerContainerEl.innerHTML = `<img src="css/card-library/images/backs/blue.svg" alt="Blue card back" class="card-back" id="dealer-hidden-card" />`;
+        } else {
+          dealerContainerEl.innerHTML += `<div class="card ${dHand[i].face}"></div>`;
+        }
+      }, i * 500);
+    }
+  }, pHand.length * 500);
+  // Update player and dealer score after cards dealt
+  setTimeout(() => {
+    pScore = getHandTotal(pHand);
+    dScore = getHandTotal(dHand);
+    checkFor21();
+  }, (pHand.length + dHand.length) * 1000);
 }
 
 // Credit: Riplit

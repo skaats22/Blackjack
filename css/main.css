@@ -70,6 +70,8 @@ h3 {
   display: flex-row;
   border-radius: 20px;
   margin: 5px 10px;
+  justify-content: center;
+  /* margin: 0; */
 }
 
 #deal, #play {
@@ -83,6 +85,7 @@ h3 {
 .hand-on {
   display: flex;
   justify-content: center;
+  margin: 0px 0px 0px 125px;
 }
 
 .hand-off {
@@ -108,7 +111,7 @@ button {
   cursor: pointer;
   font-size: inherit;
   width: 6.0em;
-  height: 7.5em;
+  height: 8em;
   background-color: #fff;
   border-radius: 0.20em;
   border: 1px solid #c3c3c3;
