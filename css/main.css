@@ -84,20 +84,41 @@ h3 {
   border-radius: 20px;
 }
 
-#hit, #stay {
+#hit, #stay, #dd {
   display: flex-row;
   border-radius: 20px;
   margin: 5px 10px;
   justify-content: center;
   min-width: 80px;
+  font-size: 24px;
+  color: white;
+}
+
+#stay {
+  background-color: red;
+}
+#hit {
+  background-color: rgb(78, 204, 78);
+}
+#dd {
+  background-color: orangered;
 }
 
 #deal, #play {
   margin: 5px 5px;
+  font-size: 24px;
+}
+
+#deal {
+  background-color: rgb(35, 10, 228);
+  color: white;
 }
 
 #bet {
   margin: 5px 0px 5px 5px;
+  font-size: 24px;
+  background-color: purple;
+  color: white;
 }
 
 .hand-on {

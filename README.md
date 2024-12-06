@@ -35,7 +35,7 @@
 1. Once your purse is empty, the game will end and you must hit `Reset` to start over.
 1. Good luck!
 
-Deployed Link (Blackjack): https://skaats22.github.io/Blackjack/
+Deployed Link to Blackjack: https://skaats22.github.io/Blackjack/
 
 ## **Next Steps**
 * Add "all-in" button

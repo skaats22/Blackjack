@@ -39,6 +39,7 @@ const hitEl = document.querySelector('#hit');
 const betEl = document.querySelector('#bet');
 const playEl = document.querySelector('#play');
 const dealEl = document.querySelector('#deal');
+const ddEl = document.querySelector('#dd');
 // Message elements
 const msgEl = document.getElementById('message');
 const initBetEl = document.querySelector('.continue');
@@ -49,6 +50,7 @@ playEl.addEventListener('click', init);
 hitEl.addEventListener('click', handlePlayerHit);
 betEl.addEventListener('click', updateWager);
 dealEl.addEventListener('click', dealHand);
+ddEl.addEventListener('click', handleDD);
 
 // Sound credit: https://freesound.org/people/AKkingStudio/sounds/684165/
 betEl.addEventListener('click', (evt) => {
@@ -127,6 +129,7 @@ function renderControls() {
   if (purse < 10) {
     if (outcome === 'D' || outcome === 'DBJ') {
       playEl.style.visibility = 'visible';
+      betEl.visibility = 'hidden';
       initBetEl.innerText = "Game Over. Reset to continue."
     }
   } else {
@@ -135,17 +138,21 @@ function renderControls() {
   }
   // If the hand is in play, then show hit & stay buttons
   if (handInPlay() === true && dScore !== 21 && pScore !== 21) {
-    setTimeout(() => {
-      hitEl.style.visibility = 'visible';
-      stayEl.style.visibility = 'visible';
-    }, 1700)
+    hitEl.style.visibility = 'visible';
+    stayEl.style.visibility = 'visible';
+    ddEl.style.visibility = 'visible';
   } else if (handInPlay() === false || currentWager === 0) {
     hitEl.style.visibility = 'hidden';
     stayEl.style.visibility = 'hidden';
+    ddEl.style.visibility = 'hidden';
   }
-  setTimeout(() => {
-    showMsg();
-  }, 300);
+  if (outcome !== null) {
+    hitEl.style.visibility = 'hidden';
+    stayEl.style.visibility = 'hidden';
+    ddEl.style.visibility = 'hidden';
+    dealEl.style.visibility = 'hidden';
+  }
+  showMsg();
 }
 
 function render() {
@@ -321,6 +328,35 @@ function handlePlayerHit() {
   checkFor21();
 }
 
+function handleDD() {
+  ddEl.innerText = 'Double Down';
+  if (outcome === null) {
+    if (purse < 10 || purse < currentWager) {
+      ddEl.innerText = 'No money!'
+      return;
+    }
+  }
+  hitEl.style.visibility = 'hidden';
+  stayEl.style.visibility = 'hidden';
+  const pRndIdx = Math.floor(Math.random() * currentDeck.length);
+  pHand.push(currentDeck.splice(pRndIdx, 1)[0]);
+  let lastIndex = pHand.length - 1;
+  let newCard = pHand[lastIndex];
+  playerContainerEl.innerHTML +=
+    `<div class="card ${newCard.face}"></div>`;
+  // Only show player score
+  pScore = getHandTotal(pHand);
+  pScoreEl.innerText = `Score: ${pScore}`;
+  purse -= currentWager;
+  currentWager += currentWager;
+  if (pScore > 21) {
+    outcome = 'D';
+  }
+  checkFor21();
+  handleDealerHit();
+  renderControls();
+}
+
 // Dealer has to hit on anything <= 16 until total is >=17
 function handleDealerHit() {
   if (pScore < 21) {
@@ -345,6 +381,7 @@ function handleDealerHit() {
     checkForWinner();
     checkFor21();
   }, 750);
+  renderControls();
 }
 
 function renderHand() {
