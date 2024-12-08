@@ -325,6 +325,7 @@ function handlePlayerHit() {
     outcome = 'D';
     checkForWinner();
   }
+  ddEl.style.visibility = 'hidden';
   checkFor21();
 }
 
@@ -335,7 +336,7 @@ function handleDD() {
       ddEl.innerText = 'No money!'
       return;
     }
-  }
+  } 
   hitEl.style.visibility = 'hidden';
   stayEl.style.visibility = 'hidden';
   const pRndIdx = Math.floor(Math.random() * currentDeck.length);
